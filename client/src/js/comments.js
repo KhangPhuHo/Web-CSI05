@@ -380,7 +380,7 @@ stickers?.forEach(btn => {
         if (file.size > 150 * 1024 * 1024) throw new Error(`File ${file.name} quá 150MB`);
         const formData = new FormData();
         formData.append("media", file);
-        const res = await fetch("https://shapespeaker.onrender.com/upload", { method: "POST", body: formData });
+        const res = await fetch("https://bookstore-bsjx.onrender.com/upload", { method: "POST", body: formData });
         const result = await res.json();
         if (!result?.data?.secure_url) throw new Error("Upload thất bại");
         return { url: result.data.secure_url, type: file.type.startsWith("video") ? "video" : "image" };

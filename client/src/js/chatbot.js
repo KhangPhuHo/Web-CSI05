@@ -266,7 +266,7 @@ async function handleCommand(input) {
     }
 
     try {
-      const response = await fetch('https://shapespeaker.onrender.com/deleteUser', {
+      const response = await fetch('https://bookstore-bsjx.onrender.com/deleteUser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

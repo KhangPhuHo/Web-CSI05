@@ -12,7 +12,7 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-const API_BASE_URL = "https://shapespeaker.onrender.com";
+const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("content");
