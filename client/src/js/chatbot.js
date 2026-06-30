@@ -166,7 +166,7 @@ async function processInput(text) {
   }
 }
 
-const SUPER_ADMIN_UID = "J1RINivGZFgXKTWfGRe4ITU3BGz2";
+const SUPER_ADMIN_UID = "7ZXC61fOA4beVOjcxwDZFqeYu9y1";
 
 // ⚙️ Cập nhật session local khi đổi quyền
 function updateLocalSessionForRoleChange({ isAdmin }) {

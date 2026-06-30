@@ -8,7 +8,7 @@ const admin = require("firebase-admin");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SUPER_ADMIN_UID = "J1RINivGZFgXKTWfGRe4ITU3BGz2";
+const SUPER_ADMIN_UID = "7ZXC61fOA4beVOjcxwDZFqeYu9y1";
 
 // ✅ Khởi tạo Firebase Admin SDK
 admin.initializeApp({
