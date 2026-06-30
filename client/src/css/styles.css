@@ -1,0 +1,69 @@
+/* Style the image to cover the entire window */
+#background-img {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.2; /* nếu muốn nền nhẹ hơn */
+} 
+
+/* Style the content over the video */
+form {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+}
+
+#content9 {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+}
+.box span{
+    color: white;
+    z-index: 10;
+}
+.box{
+    position: relative;
+    width: 120px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #00000080;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+
+.box::before{
+    content:'';
+    position: absolute;
+    width: 20px;
+    height: 140px;
+    background: linear-gradient(rgb(255, 255, 255) ,rgba(205, 173, 77, 0.801));
+    animation: rotate 3s linear infinite;
+    border-radius: 20px;
+}
+.box::after{
+    content:'';
+    position: absolute;
+    background: #0c0f1c;
+    inset: 4px;
+    border-radius: 20px;
+}
+@keyframes rotate{
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+}

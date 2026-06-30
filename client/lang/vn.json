@@ -1,0 +1,166 @@
+{
+  "toast": {
+    "session_expired": "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại.",
+    "cart_empty": "🛒 Giỏ hàng đang trống.",
+    "confirm_buy": "🛒 Bạn có chắc muốn mua {qty} x {name} ({total}) không?",
+    "confirm_checkout": "💳 Bạn có chắc muốn thanh toán {count} sản phẩm với tổng tiền {total} không?",
+    "login_required": "⚠️ Vui lòng đăng nhập để tiếp tục.",
+    "missing_user": "❌ Không tìm thấy thông tin người dùng.",
+    "missing_contact": "⚠️ Vui lòng cập nhật số điện thoại và địa chỉ.",
+    "product_not_found": "❌ Không tìm thấy sản phẩm \"{name}\".",
+    "insufficient_stock": "⚠️ Sản phẩm \"{name}\" chỉ còn {stock} trong kho.",
+    "order_created": "✅ Đã tạo đơn hàng cho \"{name}\".",
+    "order_created_all": "✅ Đã tạo đơn hàng với {count} sản phẩm.",
+    "order_error": "❌ Lỗi khi tạo đơn hàng.",
+    "max_stock_reached": "Sản phẩm \"{name}\" chỉ còn {stock} trong kho."
+  },
+  "common": {
+    "try_again_error": "Chưa thực hiện được, vui lòng thử lại sau.",
+    "confirm_password_prompt": "Nhập lại mật khẩu để xác nhận:",
+    "password_required": "Bạn chưa nhập mật khẩu.",
+    "unsupported_login_method": "Không hỗ trợ kiểu đăng nhập này.",
+    "account_deleted": "Tài khoản đã bị xóa hoàn toàn.",
+    "google_cancelled": "Bạn đã huỷ xác thực Google.",
+    "wrong_password": "Mật khẩu không chính xác.",
+    "account_delete_error": "Không thể xoá tài khoản. Vui lòng thử lại.",
+    "logout_success": "Đã đăng xuất thành công.",
+    "logout_error": "Lỗi khi đăng xuất."
+  },
+  "admin": {
+    "need_login_again": "Bạn cần đăng nhập lại để truy cập.",
+    "no_permission": "Bạn không có quyền truy cập trang này.",
+    "error": "Đã xảy ra lỗi. Vui lòng thử lại sau."
+  },
+  "menu": {
+    "home": "Trang chủ",
+    "news": "Thông tin",
+    "store": "Cửa hàng",
+    "language": "Ngôn ngữ",
+    "my_account": "Tài khoản của bạn",
+    "cart": "Giỏ hàng",
+    "orders": "Đơn đã đặt",
+    "logout": "Đăng xuất",
+    "sign_in": "Đăng nhập",
+    "no_account": "Chưa có tài khoản"
+  },
+  "modal": {
+    "confirm_title": "Xác nhận xoá tài khoản",
+    "confirm_text": "Bạn có muốn xoá tài khoản không, hành động này không thể hoàn tác!",
+    "confirm": "Xoá",
+    "cancel": "Quay lại"
+  },
+  "language": {
+    "language_title": "Ngôn ngữ",
+    "choose_language": "Chọn ngôn ngữ của bạn"
+  },
+  "news": {
+    "created": "Tạo lúc:",
+    "updated": "Cập nhật:",
+    "author": "Tác giả:",
+    "sort_newest": "Mới nhất",
+    "sort_oldest": "Cũ nhất",
+    "loading": "Tải thông tin cho bạn...",
+    "information": "Thông tin chi tiết",
+    "placeholder": "Tìm kiếm thông tin..."
+  },
+  "store": {
+    "price": "Giá:",
+    "stock": "Còn lại:",
+    "add_to_cart": "Thêm vào giỏ hàng",
+    "intro": "Giới thiệu sản phẩm",
+    "no_intro": "(Chưa có giới thiệu)",
+    "error_intro": "(Lỗi khi tải giới thiệu)",
+    "loading": "Tải đồ chơi cho bạn...",
+    "information": "Thông tin chi tiết",
+    "placeholder": "Tìm kiếm sản phẩm...",
+    "filter_price": "Lọc giá",
+    
+    "invalid_quantity": "Số lượng không hợp lệ",
+    "limit_quantity": "Bạn chỉ có thể mua tối đa {max} sản phẩm nữa",
+    "added_quantity": "Đã thêm {qty} x {name} vào giỏ hàng",
+    "added_to_cart": "🌟 Đã thêm \"{name}\" vào giỏ hàng!"
+  },
+  "myaccount": {
+    "my_account_title": "Tài khoản của bạn",
+    "update_info": "Cập nhật thông tin",
+    "name": "Họ và tên",
+    "email": "Email",
+    "current_password": "Mật khẩu hiện tại",
+    "new_password": "Mật khẩu mới",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ",
+    "avatar": "Ảnh đại diện (URL)",
+    "submit": "Xác nhận",
+    "your_profile": "Hồ sơ của bạn",
+    "load_error": "Lỗi khi tải thông tin tài khoản.",
+    "guest_view_notice": "Bạn đang xem với tư cách khách. Hãy đăng nhập để chỉnh sửa!",
+    "invalid_phone": "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng Việt Nam!",
+    "invalid_address": "Địa chỉ phải có định dạng: số nhà, đường, phường/xã, quận/huyện, tỉnh/thành.",
+    "password_required_for_update": "Bạn cần nhập mật khẩu để thay đổi email hoặc mật khẩu.",
+    "update_success": "Cập nhật thành công!",
+    "update_error": "Cập nhật thất bại. Vui lòng thử lại."
+  },
+  "cart": {
+    "buy": "Mua ngay",
+    "delete": "Xoá",
+    "price": "Giá:",
+    "stock": "Còn lại:",
+    "total": "Tổng cộng:",
+    "empty": "Chưa có sản phẩm nào trong giỏ hàng.",
+    "checkoutAll": "Thanh toán toàn bộ"
+  },
+  "footer": {
+    "slogan": "ĐỒ CHƠI CHO TRẺ EM",
+    "contact": "Liên hệ với chúng tôi",
+    "find_us": "Tìm chúng tôi",
+    "copyright": "2026 BookStore. Đã đăng ký bản quyền."
+  },
+  "rating": {
+    "vote_singular": "phiếu",
+    "vote_plural": "phiếu",
+    "no_review": "Chưa có đánh giá",
+    "login_required": "Bạn cần đăng nhập để đánh giá!",
+    "thank_you": "🎉 Đánh giá của bạn đã được ghi nhận!"
+  },
+  "orders": {
+    "empty": "Bạn chưa có đơn hàng nào.",
+    "productID": "Mã đơn:",
+    "date": "Ngày đặt:",
+    "status": {
+      "pending": "⏳ Đang chờ xác nhận",
+      "processing": "🔧 Đang xử lý",
+      "shipped": "🚚 Đang giao hàng",
+      "delivered": "✅ Đã giao",
+      "cancelled": "❌ Đã hủy",
+      "unknown": "❓ Không rõ"
+    },
+    "cancel_reason": "Lý do huỷ"
+  },
+  "login": {
+    "google": {
+      "popup_closed": "Bạn đã đóng cửa sổ đăng nhập.",
+      "account_exists": "Tài khoản đã tồn tại với phương thức đăng nhập khác.",
+      "network_failed": "Không thể kết nối mạng. Vui lòng kiểm tra Internet.",
+      "default_error": "Đã xảy ra lỗi khi đăng nhập bằng Google. Vui lòng thử lại sau.",
+      "success": "Đăng nhập Google thành công."
+    },
+    "login_title": "Đăng nhập",
+    "wel_back": "Chào mừng trở lại!",
+    "password": "Mật khẩu",
+    "login": "Đăng nhập",
+    "verify_password": "Xác nhận lại mật khẩu",
+    "haven't": "Không có tài khoản?",
+    "register": "Đăng kí",
+    "or": "Hoặc",
+    "google_login": "Đăng nhập bằng Google",
+    "join_us": "Tham gia cùng chúng tôi!",
+    "username": "Tên người dùng",
+    "have_account": "Đã có tài khoản?",
+    "fill_all_fields": "Vui lòng điền đầy đủ thông tin.",
+    "password_mismatch": "Mật khẩu không khớp.",
+    "signup_success": "Đăng ký thành công!",
+    "signup_failed": "Đăng ký thất bại. Vui lòng thử lại.",
+    "login_success": "Đăng nhập thành công!",
+    "login_failed": "Đăng nhập thất bại. Vui lòng thử lại."
+  }
+}

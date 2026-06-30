@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="login.login_title">Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./src/css/login.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+    <link rel="stylesheet" href="./src/css/toast.css">
+    <link rel="stylesheet" href="./src/css/mascot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" href="./src/img/logo.jpg">
+    <style>
+        /* Style the video to cover the entire window */
+        #background-img {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+        }
+
+        #lang-toggle-wrapper {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9998;
+        }
+
+        #lang-toggle-wrapper * {
+            pointer-events: auto;
+        }
+
+        .lang-button {
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(135deg, #ffd166, #ff9f1c);
+            border-radius: 9999px;
+            /* hình viên thuốc */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #fff;
+            font-size: 0.875rem;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lang-button:hover {
+            transform: scale(1.1) rotate(-3deg);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .lang-button span {
+            width: 24px;
+            height: 24px;
+            border-radius: 30%;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="background-img" src="./src/img/background.webp" alt="background">
+    <!-- Language Cycle Button -->
+    <!-- Nút chuyển ngôn ngữ -->
+    <div id="lang-toggle-wrapper" class="fixed top-4 right-4 z-50">
+        <button id="lang-toggle" class="lang-button transition-all duration-300 ease-in-out">
+            <!-- Icon cờ sẽ được gán qua JS -->
+        </button>
+    </div>
+
+    <div class="wrapper">
+        <!-- Login Form -->
+        <div class="form-box login">
+            <h2 class="text-2xl font-bold text-center" data-i18n="login.wel_back">Welcome Back!</h2>
+            <form id="login-form">
+                <div class="input-box">
+                    <input id="login-email" type="email" minlength="6" required>
+                    <label>Email</label>
+                </div>
+                <div class="input-box">
+                    <input id="login-password" type="password" required><i class="fa fa-eye toggle-password"
+                        aria-hidden="true"></i>
+                    <label data-i18n="login.password">Password</label>
+                </div>
+                <button id="login-button" type="submit" data-i18n="login.login">Login</button>
+                <p class="switch-form"><span data-i18n="login.haven't">Don't have an account?</span>
+                    <a href="#" id="show-register" data-i18n="login.register">Register</a>
+                </p>
+                <div class="divider">
+                    <hr>
+                    <span data-i18n="login.or">OR</span>
+                    <hr>
+                </div>
+                <!-- Google Login Button -->
+                <div class="social-login">
+                    <button id="google-login">
+                        <i class="fa fa-google"></i>
+                        <span data-i18n="login.google_login">Login with Google</span>
+                    </button>
+                </div>
+                <br>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-box register">
+            <h2 class="text-2xl font-bold text-center" data-i18n="login.join_us">Join Us!</h2>
+            <form id="signup-form">
+                <div class="input-box">
+                    <input type="text" id="name" required>
+                    <label data-i18n="login.username">Username</label>
+                </div>
+                <div class="input-box">
+                    <input id="signup-email" required>
+                    <label>Email</label>
+                </div>
+                <div class="input-box">
+                    <input id="signup-password" type="password" required><i class="fa fa-eye toggle-password"
+                        aria-hidden="true"></i>
+                    <label data-i18n="login.password">Password</label>
+                </div>
+                <div class="input-box">
+                    <input type="password" id="confirm-password" required> <i class="fa fa-eye toggle-password"
+                        aria-hidden="true"> </i>
+                    <label data-i18n="login.verify_password">Verify Password</label>
+                </div>
+                <button type="submit" class="btn" data-i18n="login.register">Register</button>
+                <p class="switch-form"><span data-i18n="login.have_account">Already have an account?</span>
+                    <a href="#" id="show-login" data-i18n="login.login">Login</a>
+                </p>
+                <br>
+                <br>
+                <h3 id="alert_signup"></h3>
+            </form>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <script type="module" src="./src/js/language.js" defer></script>
+    <script type="module" src="./src/js/toast.js"></script>
+    
+    <script type="module" src="./src/js/firebase-config.js"></script><!--./hocsinh/js/-->
+    <script type="module" src="./src/js/login.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.17.1/build/matter.min.js"></script>
+    <script src="./src/js/floating-shapes.js" defer></script>
+    <script type="module" src="./src/js/mascot.js" defer></script>
+    <script type="module">
+        import { enableSessionKeepAlive } from "./src/js/session-keeper.js";
+        enableSessionKeepAlive();
+    </script>
+    <script type="module" src="./src/js/googleprofile.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+#bot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  z-index: 9999;
+}
+
+#summon img {
+  width: 100%;
+  height: 100%;
+}
+
+#chatbot {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 14px;
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+#chatbot.show {
+  display: flex;
+  opacity: 1;
+}
+
+#chat-header {
+  background: #4f46e5;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#chat-header button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+#chat-body {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+  background: white;
+}
+
+.message {
+  margin: 8px 0;
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  clear: both;
+}
+
+.left {
+  background: #e1f5fe;
+  float: left;
+  text-align: left;
+}
+
+.right {
+  background: #c8e6c9;
+  float: right;
+  text-align: right;
+}
+
+#chat-input {
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background: #fafafa;
+  display: flex;
+  gap: 8px;
+}
+
+#chat-input input[type="text"] {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+#chat-input button {
+  padding: 8px 15px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#chat-popup {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: #4f46e5;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+  font-size: 14px;
+  z-index: 9999;
+  user-select: none;
+}
+
+/*Hiệu ứng gõ khi chatbot đang chat*/
+.typing-indicator {
+  display: inline-block;
+  font-style: italic;
+  color: #888;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}

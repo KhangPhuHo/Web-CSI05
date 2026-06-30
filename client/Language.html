@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="language.language_title">Language</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="website icon" type="image/png" href="./src/img/logo.jpg">
+  <link rel="stylesheet" href="./src/css/chatbot.css">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./src/css/styles.css">
+  <link rel="stylesheet" href="./src/css/menure.css">
+  <link rel="stylesheet" href="./src/css/toast.css">
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #4f46e5;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body class=" font-sans">
+  <img id="background-img" src="./src/img/background.webp" alt="background">
+
+  <div id="Menu"></div>
+  <div id="bot"></div>
+
+  <div class="min-h-screen flex flex-col justify-center items-center px-4">
+    <div class="bg-black/60 backdrop-blur-md p-8 rounded-xl shadow-lg text-center max-w-xl w-full mt-32">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-yellow-400" data-i18n="language.choose_language">Choose your
+        language</h2>
+      <div class="flex justify-center gap-10 mt-6">
+        <img id="lang-en" src="https://flagicons.lipis.dev/flags/4x3/um.svg"
+          class="w-16 sm:w-20 rounded-xl shadow cursor-pointer" alt="English">
+        <img id="lang-vn" src="https://flagicons.lipis.dev/flags/4x3/vn.svg"
+          class="w-16 sm:w-20 rounded-xl shadow cursor-pointer" alt="Vietnamese">
+      </div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-8 border-t border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <!-- Logo & Name -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+        <img src="./src/img/logo.jpg" alt="logo" class="w-16 h-16 aspect-square rounded-full object-cover">
+        <a href="home.html" class="flex items-center font-extrabold space-x-2"><span
+            class="text-lg md:text-xl">ShapeSpeak</span></a>
+        <p class="text-sm text-gray-400 font-semibold" data-i18n="footer.slogan"> TOY FOR CHILDREN</p>
+      </div>
+
+      <!-- Contact Us -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+        <h3 class="text-lg font-semibold text-white" data-i18n="footer.contact">Contact Us</h3>
+        <div class="flex space-x-4 text-2xl">
+          <a href="https://x.com/i/flow/login" class="hover:text-yellow-400 transition">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href="https://www.facebook.com/" class="text-blue-600 hover:text-yellow-400 transition">
+            <i class="fa-brands fa-facebook"></i>
+          </a>
+          <a href="https://www.instagram.com/" class="text-pink-500 hover:text-yellow-400 transition">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.google.com/intl/vi/gmail/about/" class="text-red-400 hover:text-yellow-400 transition">
+            <i class="fa-solid fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Find Us -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+        <h3 class="text-lg font-semibold text-white" data-i18n="footer.find_us">Find Us</h3>
+        <iframe src="https://maps.google.com/maps?q=HCMCity,+Njemačka&output=embed" width="100%" height="250"
+          frameborder="0" style="border:0" allowfullscreen></iframe>
+      </div>
+
+    </div>
+
+    <!-- Bottom -->
+    <div class="text-center text-gray-500 text-xs mt-6" data-i18n="footer.copyright">
+      &copy; 2026 BookStore. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-[1100] space-y-2 max-w-xs w-full md:w-auto mx-auto md:mx-0">
+  </div>
+
+  <script type="module" src="./src/js/language.js" defer></script>
+  <script type="module" src="./src/js/toast.js"></script>
+
+  <script type="module" src="./src/js/firebase-config.js"></script>
+  <script src="./src/js/menu.js"></script>
+  <script type="module" src="./src/js/profile.js"></script>
+  <script type="module" src="./src/js/logout.js"></script>
+  <script type="module" src="./src/js/chatbot.js"></script>
+  <script type="module">
+    import { enableSessionKeepAlive } from "./src/js/session-keeper.js";
+    enableSessionKeepAlive();
+  </script>
+</body>
+
+</html>

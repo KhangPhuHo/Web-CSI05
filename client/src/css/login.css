@@ -1,0 +1,197 @@
+/* Variables */
+:root {
+    --black: #000;
+    --white: #fff;
+    --gray: #ccc;
+    --transition-time: 0.7s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: none;
+    font-family: Arial, sans-serif;
+}
+
+.wrapper {
+    position: relative;
+    z-index: 2; /* thêm dòng này */
+    width: 450px;
+    height: 550px;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.form-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform var(--transition-time) ease;
+}
+
+.form-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--black);
+}
+
+.input-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid var(--gray);
+    outline: none;
+    font-size: 16px;
+}
+
+.input-box label {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    transition: 0.3s;
+    color: var(--gray);
+}
+
+.input-box input:focus ~ label,
+.input-box input:valid ~ label {
+    top: -15px;
+    font-size: 12px;
+    color: var(--black);
+}
+
+.btn {
+    border-radius: 10px;
+    width: 100%;
+    padding: 10px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.switch-form {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.switch-form a {
+    text-decoration: none;
+    color: var(--black);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login {
+    transform: translateX(0);
+}
+
+.register {
+    transform: translateX(100%);
+}
+
+.wrapper.active .login {
+    transform: translateX(-100%);
+}
+
+.wrapper.active .register {
+    transform: translateX(0);
+}
+
+.input-box {
+    position: relative;
+}
+
+.input-box input[type="password"] {
+    padding-right: 30px; /* Khoảng cách dành cho icon con mắt */
+}
+
+.input-box .toggle-password {
+    position: absolute;
+    right: 10px; /* Đặt icon con mắt bên phải */
+    top: 50%;
+    transform: translateY(-50%); /* Canh giữa theo chiều dọc */
+    cursor: pointer;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.divider hr {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 0 10px;
+}
+
+.divider span {
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+}
+#google-login{
+    border-radius: 10px;
+    width: 100%;
+    padding: 10px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+#logoutButton{
+    border-radius: 10px;
+    width: 100%;
+    padding: 10px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+#login-button{
+    border-radius: 10px;
+    width: 100%;
+    padding: 10px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#toast-container {
+  position: fixed !important;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  max-width: 300px;
+}

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ShapeSpeak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font & style adjustments */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Custom font for headings similar to the sample */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 900;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-weight: 900;
+        }
+
+        /* Scrollbar style */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 10px;
+        }
+
+        /* CSS cho hiệu ứng làm rõ */
+        .loading {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .loaded {
+            opacity: 1;
+        }
+
+        @media only screen and (max-width: 768px) {
+            #Menu1 {
+                text-align: center;
+                width: 600px;
+            }
+
+            #Menu {
+                display: flex;
+                flex-direction: row;
+            }
+        }
+
+        #Menu .info {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #Menu {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            margin-left: -10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(46, 46, 46, 0.911);
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        #Signin {
+            position: relative;
+            left: -15px;
+            background-color: rgb(49, 55, 56);
+            border-radius: 10px;
+        }
+
+        #logoutButton {
+            position: relative;
+            background-color: rgba(70, 97, 118, 0.318);
+            left: -15px;
+            border-radius: 10px;
+        }
+
+        .hero-overlay {
+            background-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./src/css/menure.css">
+    <link rel="stylesheet" href="./src/css/styles.css">
+    <link rel="stylesheet" href="./src/css/toast.css">
+    <link rel="stylesheet" href="./src/css/chatbot.css">
+    <!-- Thêm vào <head> -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="website icon" type="png" href="./src/img/logo.jpg">
+</head>
+
+<body class="text-gray-900 antialiased scroll-smooth" class="loading">
+    <img id="background-img" src="./src/img/background.webp" alt="background">
+
+    <!-- Header -->
+    <div id="Menu"></div>
+    <div id="bot"></div>
+    <!-- Hero Section -->
+    <br><br><br><br><br>
+
+    <section id="impact" class="bg-indigo-600 text-white py-20 px-6" data-aos="fade-up">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-extrabold max-w-4xl mx-auto leading-tight">
+                Transforming Early Math Education
+            </h2>
+            <p class="mt-6 text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed font-normal">
+                ShapeSpeak combines tactile learning with RFID technology to create an inclusive, interactive math
+                experience for children ages 2–4, including visually impaired learners.
+            </p>
+            <button
+                class="mt-10 bg-white text-[#3B44F6] font-semibold text-lg sm:text-xl rounded-full px-8 py-3 inline-flex items-center gap-2 hover:bg-gray-100 transition"
+                type="button">
+                Discover How It Works
+                <i class="fa fa-arrow-right" aria-hidden="true"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-16 px-6 max-w-4xl mx-auto text-center" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Our Mission</h2>
+        <p class="text-gray-600 max-w-xl mx-auto text-lg md:text-xl">
+            To revolutionize early childhood education by creating interactive learning tools that make math concepts
+            accessible, engaging, and fun for all children, regardless of ability.
+        </p>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 px-6 bg-gray-50 max-w-7xl mx-auto" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-4">Interactive Learning Features</h2>
+        <p class="text-center text-gray-600 mb-12 max-w-3xl mx-auto text-lg md:text-xl">
+            ShapeSpeak brings math to life through multi-sensory experiences
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+            <!-- Feature 1 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-shapes text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Tactile Shape Recognition</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Each geometric piece has a unique RFID tag that identifies its shape when placed on the base,
+                    helping children learn through touch and sound.
+                </p>
+            </article>
+
+            <!-- Feature 2 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-puzzle-piece text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Creative Assembly</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Children combine shapes to create complete objects, triggering educational stories about simple
+                    arithmetic and geometric properties.
+                </p>
+            </article>
+
+            <!-- Feature 3 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-eye-slash text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Inclusive Design</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Special textures and audio feedback make ShapeSpeak equally effective for visually impaired
+                    children, promoting inclusive education.
+                </p>
+            </article>
+
+            <!-- Feature 4 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-mobile-screen-button text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Companion App</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Our upcoming app will expand learning opportunities with educational games and interactive content
+                    for children and parents.
+                </p>
+            </article>
+
+            <!-- Feature 5 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-brain text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Cognitive Development</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Enhances logical thinking, shape recognition, and problem-solving skills through playful, hands-on
+                    activities.
+                </p>
+            </article>
+
+            <!-- Feature 6 -->
+            <article class="rounded-lg bg-white shadow-md p-6 hover:shadow-xl transition">
+                <i class="fa-solid fa-palette text-indigo-600 text-3xl mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Vibrant Colors</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Bright, attractive colors stimulate visual learning and make the experience more engaging for young
+                    children.
+                </p>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="py-16 px-6 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12"
+        data-aos="fade-up">
+        <div class="md:w-1/2">
+            <h2 class="text-3xl font-extrabold mb-4 max-w-lg">Innovative RFID Technology</h2>
+            <p class="text-gray-700 mb-6 max-w-lg text-lg leading-relaxed">
+                ShapeSpeak leverages cutting-edge RFID (Radio–Frequency Identification) technology to create a seamless
+                interactive learning experience.
+            </p>
+            <ul class="space-y-3 text-gray-700 max-w-lg">
+                <li class="flex items-start gap-3">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    <span><strong>Instant Feedback:</strong> Each shape piece contains an RFID tag that communicates
+                        with the base station</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    <span><strong>Secure Connection:</strong> Magnets ensure proper alignment while preventing
+                        accidental swallowing</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    <span><strong>Expandable System:</strong> New shape sets can be added without hardware
+                        changes</span>
+                </li>
+            </ul>
+        </div>
+        <div class="md:w-1/2 p-6 bg-indigo-100 rounded-2xl shadow-lg">
+            <img src="./src/img/RemarkableDiscount.png" alt="Remarkable Discount"
+                class="rounded-xl shadow-lg" />
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact" class="bg-indigo-600 text-white py-20 px-6" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-extrabold max-w-4xl mx-auto leading-tight">
+                Transformative Educational Impact
+            </h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg leading-relaxed font-normal">
+                ShapeSpeak addresses critical developmental needs during the crucial early childhood years
+            </p>
+        </div>
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div class="bg-indigo-500 rounded-lg p-8 space-y-3">
+                <h3 class="text-5xl font-extrabold leading-none">2–4</h3>
+                <h4 class="text-xl font-extrabold">Optimal Learning Age</h4>
+                <p class="text-indigo-200 font-normal text-lg leading-relaxed">Targets the critical developmental window
+                    when children's brains are most receptive to foundational math concepts</p>
+            </div>
+            <div class="bg-indigo-500 rounded-lg p-8 space-y-3">
+                <h3 class="text-5xl font-extrabold leading-none">100%</h3>
+                <h4 class="text-xl font-extrabold">Inclusive Design</h4>
+                <p class="text-indigo-200 font-normal text-lg leading-relaxed">Equally effective for sighted and
+                    visually impaired children, promoting equal learning opportunities</p>
+            </div>
+            <div class="bg-indigo-500 rounded-lg p-8 space-y-3">
+                <h3 class="text-5xl font-extrabold leading-none">5x</h3>
+                <h4 class="text-xl font-extrabold">Engagement Boost</h4>
+                <p class="text-indigo-200 font-normal text-lg leading-relaxed">Multi-sensory approach increases
+                    engagement and retention compared to traditional methods</p>
+            </div>
+        </div>
+    </section>
+
+    <main class="max-w-6xl mx-auto px-6 md:px-12 py-16">
+        <!-- Our Vision & Values Heading -->
+        <section class="mb-24" data-aos="fade-up">
+            <h2 class="text-center text-3xl font-extrabold mb-12 text-slate-900">Our Vision &amp; Values</h2>
+
+            <div class="flex flex-col md:flex-row md:space-x-24 gap-12 md:gap-0">
+
+                <!-- Vision Statement -->
+                <article class="md:flex-1">
+                    <h3 class="text-indigo-600 font-bold text-lg mb-4">Vision Statement</h3>
+                    <p class="text-slate-700 mb-8 max-w-xl">
+                        To become the global standard in early childhood math education, transforming how children ages
+                        2–4 develop foundational mathematical thinking through innovative, inclusive technology.
+                    </p>
+
+                    <div class="bg-indigo-100 rounded-lg p-6 max-w-xl">
+                        <h4 class="font-semibold text-indigo-700 mb-3">Future Roadmap</h4>
+                        <ul class="list-disc list-inside text-slate-700 space-y-2">
+                            <li>Expand to additional STEM concepts beyond geometry</li>
+                            <li>Develop multilingual support for global accessibility</li>
+                            <li>Create adaptive learning algorithms that personalize content</li>
+                            <li>Partner with educational institutions for curriculum integration</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Core Values -->
+                <article class="md:flex-1">
+                    <h3 class="text-indigo-600 font-bold text-lg mb-6">Core Values</h3>
+
+                    <ul class="space-y-6 text-slate-700 max-w-xl">
+                        <li class="flex space-x-3">
+                            <i style="color: #4f46e5;" class="fa fa-line-chart" aria-hidden="true"></i>
+                            <div>
+                                <p class="font-semibold text-slate-900">Innovation</p>
+                                <p>We constantly push boundaries to create groundbreaking educational tools</p>
+                            </div>
+                        </li>
+                        <li class="flex space-x-4">
+                            <i style="color: #4f46e5;" class="fa fa-heart" aria-hidden="true"></i>
+                            <div>
+                                <p class="font-semibold text-slate-900">Inclusivity</p>
+                                <p>We design for all children, ensuring no one is left behind in learning</p>
+                            </div>
+                        </li>
+                        <li class="flex space-x-3">
+                            <i style="color: #4f46e5;" class="fa fa-smile-o fa-lg" aria-hidden="true"></i>
+                            <div>
+                                <p class="font-semibold text-slate-900">Joyful Learning</p>
+                                <p>We believe education should be fun, engaging, and inspiring</p>
+                            </div>
+                        </li>
+                        <li class="flex space-x-1">
+                            <svg class="w-6 h-6 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"
+                                aria-hidden="true">
+                                <path d="M12 2v20M7 7l5 5 5-5" />
+                            </svg>
+                            <div>
+                                <p class="font-semibold text-slate-900">Growth Mindset</p>
+                                <p>We foster curiosity and resilience in young learners</p>
+                            </div>
+                        </li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <!-- What Experts Say -->
+        <section data-aos="fade-up">
+            <h2 class="text-center text-3xl font-extrabold mb-10 text-slate-900">What Experts Say</h2>
+
+            <div class="max-w-3xl bg-white rounded-xl shadow-md p-8 mx-auto">
+                <div class="flex items-center space-x-5 mb-4">
+                    <div
+                        class="inline-flex items-center justify-center h-14 w-14 rounded-full bg-indigo-200 text-indigo-700 flex-shrink-0">
+                        <!-- Icon: Academic cap -->
+                        <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                    </div>
+                    <div class="text-gray-800">
+                        <p class="font-semibold text-lg text-slate-900">Dr. Emily Chen</p>
+                        <p class="text-sm text-gray-500">Child Development Specialist</p>
+                    </div>
+                </div>
+                <blockquote class="italic text-slate-700 text-lg leading-relaxed">
+                    "ShapeSpeak represents a paradigm shift in early math education. By combining tactile, auditory, and
+                    visual learning modalities, it addresses multiple learning styles simultaneously – a game-changer
+                    for inclusive education."
+                </blockquote>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- Vision Anchor for Navigation -->
+    <section id="vision" class="h-24"></section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-8 border-t border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <!-- Logo & Name -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+                <img src="./src/img/logo.jpg" alt="logo"
+                    class="w-16 h-16 aspect-square rounded-full object-cover">
+                <a href="home.html" class="flex items-center font-extrabold space-x-2"><span
+                        class="text-lg md:text-xl">ShapeSpeak</span></a>
+                <p class="text-sm text-gray-400 font-semibold" data-i18n="footer.slogan"> TOY FOR CHILDREN</p>
+            </div>
+
+            <!-- Contact Us -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+                <h3 class="text-lg font-semibold text-white" data-i18n="footer.contact">Contact Us</h3>
+                <div class="flex space-x-4 text-2xl">
+                    <a href="https://x.com/i/flow/login" class="hover:text-yellow-400 transition">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="https://www.facebook.com/" class="text-blue-600 hover:text-yellow-400 transition">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="https://www.instagram.com/" class="text-pink-500 hover:text-yellow-400 transition">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.google.com/intl/vi/gmail/about/"
+                        class="text-red-400 hover:text-yellow-400 transition">
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Find Us -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
+                <h3 class="text-lg font-semibold text-white" data-i18n="footer.find_us">Find Us</h3>
+                <iframe src="https://maps.google.com/maps?q=HCMCity,+Njemačka&output=embed" width="100%" height="250"
+                    frameborder="0" style="border:0" allowfullscreen></iframe>
+            </div>
+
+        </div>
+
+        <!-- Bottom -->
+        <div class="text-center text-gray-500 text-xs mt-6" data-i18n="footer.copyright">
+            &copy; 2026 BookStore. All rights reserved.
+        </div>
+    </footer>
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-[1100] space-y-2 max-w-xs w-full md:w-auto mx-auto md:mx-0">
+    </div>
+
+    <script type="module" src="./src/js/language.js" defer></script>
+    <script type="module" src="./src/js/toast.js"></script>
+
+    <!-- Chú ý: script type="module" -->
+    <script type="module" src="./src/js/firebase-config.js"></script>
+    <script src="./src/js/menu.js"></script>
+    <script type="module" src="./src/js/profile.js"></script>
+    <script type="module" src="./src/js/logout.js"></script>
+    <script type="module" src="./src/js/chatbot.js"></script>
+    <script type="module">
+        import { enableSessionKeepAlive } from "./src/js/session-keeper.js";
+        enableSessionKeepAlive();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.remove('loading');
+            document.body.classList.add('loaded');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>AOS.init();</script>
+</body>
+
+</html>

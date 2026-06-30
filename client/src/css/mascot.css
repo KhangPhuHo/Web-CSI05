@@ -1,0 +1,42 @@
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1; /* Trên nền nhưng dưới các nút login */
+  pointer-events: auto; /* ✅ Cho phép bắt sự kiện kéo */
+}
+
+
+#mascot-left, #mascot-right {
+  position: fixed;
+  bottom: 0;
+  z-index: 10;
+  width: 180px;
+  transition: transform 0.5s ease;
+}
+
+#mascot-left {
+  left: 0;
+}
+
+#mascot-right {
+  right: 0;
+}
+
+#mascot-left img,
+#mascot-right img {
+  width: 100%;
+  animation: wave 4s infinite ease-in-out;
+  pointer-events: none;
+  will-change: transform; /* ✅ Tối ưu hiệu năng khi có transform */
+}
+
+/* Animation tay vẫy */
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(5deg); }
+  40% { transform: rotate(-5deg); }
+  60% { transform: rotate(5deg); }
+  80% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}

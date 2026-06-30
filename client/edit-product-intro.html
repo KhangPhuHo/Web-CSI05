@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trình chỉnh sửa Giới thiệu</title>
+  <link rel="website icon" type="image/png" href="./src/img/shapespeakicon.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    #canvas-area::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #canvas-area::-webkit-scrollbar-thumb {
+      background-color: #6366f1;
+      /* Tailwind indigo-500 */
+      border-radius: 10px;
+    }
+
+    #canvas-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #canvas-area::-webkit-scrollbar-button {
+      display: none;
+    }
+
+    .block-item {
+      position: absolute;
+      cursor: move;
+      user-select: text;
+      border: 1px dashed #ccc;
+      padding: 8px;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
+    .block-item[contenteditable="true"] {
+      cursor: text;
+    }
+
+    .block-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .block-item button {
+      pointer-events: auto;
+      /* ✅ nút vẫn bấm được */
+    }
+
+    .block-badge-handle {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 12px;
+      height: 12px;
+      background: #facc15;
+      border-radius: 50%;
+      cursor: move;
+      z-index: 150;
+    }
+
+    /* Thêm nút resize góc phải */
+    .block-item .resize-handle {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 2px;
+      cursor: nwse-resize;
+      z-index: 10;
+      opacity: 0.6;
+    }
+
+    #block-popup-menu button {
+      font-size: 18px;
+      transition: background 0.2s ease;
+    }
+
+    .overlapping-block {
+      outline: 2px solid #f87171 !important;
+      /* đỏ */
+      outline-offset: -2px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#0f172a] text-white">
+  <!-- Toolbar trên cùng góc trái -->
+  <div class="absolute top-3 left-3 z-20 flex gap-2">
+    <button id="undo" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-white">
+      <i class="fa-solid fa-rotate-left"></i>
+    </button>
+    <button id="redo" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-white">
+      <i class="fa-solid fa-rotate-right"></i>
+    </button>
+    <button id="save-content" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-black font-semibold">
+      <i class="fa-solid fa-floppy-disk"></i> Lưu
+    </button>
+  </div>
+
+  <div class="flex h-screen">
+
+    <!-- BÊN TRÁI: Mô phỏng mặt sau popup -->
+    <div class="flex-1 flex justify-center items-center bg-gray-900">
+      <!-- Phần mô phỏng Popup ở giữa -->
+      <div id="canvas-area"
+        class="relative w-full max-w-lg h-[95vh] overflow-y-auto border-2 border-dashed border-gray-600 rounded-xl p-4">
+
+        <!-- Nút quay lại -->
+        <button class="absolute top-4 left-4 text-white z-10 hover:text-yellow-400 transition">
+          <i class="fa fa-arrow-left"></i>
+        </button>
+
+        <!-- Tiêu đề -->
+        <h2 class="text-center text-2xl font-bold text-yellow-400 mb-4">
+          Giới thiệu
+        </h2>
+
+        <!-- Vùng mô phỏng nội dung: giống y như mặt sau popup -->
+        <div id="editable-area" class="relative w-full min-h-[80vh] bg-transparent rounded-xl overflow-hidden">
+          <!-- Các block sẽ được tạo ở đây bằng JS -->
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- BÊN PHẢI: Công cụ chỉnh sửa -->
+    <div class="w-1/4 bg-gray-900 p-4 space-y-4 border-l border-white/10">
+      <h2 class="text-lg font-bold text-yellow-400 text-center">Công cụ</h2>
+
+      <button id="add-text" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded">➕ Thêm chữ</button>
+      <button id="add-image" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded">🖼️ Thêm ảnh</button>
+      <button id="add-quote" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded">💬 Thêm trích
+        dẫn</button>
+
+
+
+      <!-- Thanh công cụ nâng cao -->
+      <div id="tool-options" class="hidden mt-4">
+
+        <div id="rotate-options" class="flex items-center gap-2 text-sm text-white mt-2 hidden">
+          <label for="rotateSlider">Xoay:</label>
+          <input type="range" id="rotateSlider" min="-180" max="180" value="0" class="w-32" />
+          <span id="rotate-angle">0°</span>
+          <button id="reset-rotate" class="ml-2 border px-2 py-1 rounded hover:bg-gray-700">↺</button>
+        </div>
+
+        <label class="text-white text-sm flex items-center gap-2">
+          <input type="checkbox" id="keepRatio" checked>
+          Giữ tỷ lệ ảnh
+        </label>
+
+        <!-- 👇 Gói các tùy chọn text vào #text-options -->
+        <div id="text-options">
+          <label class="block text-sm mb-1">Căn chỉnh:</label>
+          <div class="flex gap-1 mb-2">
+            <button data-align="left" class="flex-1 bg-gray-600 hover:bg-gray-700 py-1 text-sm">Trái</button>
+            <button data-align="center" class="flex-1 bg-gray-600 hover:bg-gray-700 py-1 text-sm">Giữa</button>
+            <button data-align="right" class="flex-1 bg-gray-600 hover:bg-gray-700 py-1 text-sm">Phải</button>
+          </div>
+
+          <label class="block text-sm mb-1">Cỡ chữ:</label>
+          <input type="range" min="10" max="48" id="font-size-slider" class="w-full">
+
+          <label class="block text-sm mt-2 mb-1">Màu chữ:</label>
+          <input type="color" id="font-color-picker" class="w-full">
+
+          <button id="bold-toggle" class="w-full mt-2 bg-gray-600 hover:bg-gray-700 py-1 text-sm">Bật/Tắt in
+            đậm</button>
+        </div>
+
+        <input type="file" id="image-picker" accept="image/*" class="hidden" />
+      </div>
+    </div>
+
+    <!-- Popup thao tác block -->
+    <div id="block-popup-menu"
+      class="hidden absolute z-[9999] bg-white rounded-xl shadow-lg px-2 py-1 flex space-x-2 items-center">
+      <button title="Xoá" id="popup-delete" class="text-red-600 hover:bg-gray-100 p-2 rounded-full">
+        🗑
+      </button>
+      <button title="Nhân bản" id="popup-duplicate" class="hover:bg-gray-100 p-2 rounded-full">
+        📄
+      </button>
+      <button title="Đưa lên trên" id="popup-bring-front" class="hover:bg-gray-100 p-2 rounded-full">
+        🔝
+      </button>
+      <button title="Đưa xuống dưới" id="popup-send-back" class="hover:bg-gray-100 p-2 rounded-full">
+        🔽
+      </button>
+    </div>
+
+    <audio id="trash-sound" src="./src/sounds/trash.mp3" preload="auto"></audio>
+    <audio id="duplicate-sound" src="./src/sounds/duplicate.mp3" preload="auto"></audio>
+    <script type="module" src="./src/js/edit-intro-editor.js"></script>
+</body>
+
+</html>

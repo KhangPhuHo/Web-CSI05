@@ -1,0 +1,88 @@
+/* Default styles */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Tablet styles (max-width: 800px) */
+@media only screen and (max-width: 756px) {
+    #Menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+    }
+
+    #Menu1 {
+        display: none;
+    }
+
+    #menu-toggle {
+        display: block;
+        background-color: rgb(79, 25, 229);
+        color: white;
+        height: 35px;
+        width: 35px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #menu-toggle i{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #Menu1.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 71px;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        z-index: 1000;
+        padding: 10px;
+    }
+
+}
+
+/* Laptop styles (min-width: 801px) */
+@media only screen and (min-width: 801px) {
+    #menu-toggle {
+        display: none;
+    }
+}
+
+#logoutButton {
+    position: relative;
+    left: 0px;
+    background-color: rgba(70, 97, 118, 0.318);
+    border-radius: 10px;
+}
+
+#Menu .info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#Menu {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    margin-left: -10px;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+    align-items: center;
+    background-color: rgba(46, 46, 46, 0.911);
+    z-index: 1000;
+}
+
+#Signin {
+    position: relative;
+    left: 0px;
+    background-color: rgb(49, 55, 56);
+    border-radius: 10px;
+}

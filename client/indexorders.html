@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý đơn hàng theo người dùng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="./src/css/styles.css" />
+    <link rel="stylesheet" href="./src/css/toast.css" />
+    <link rel="stylesheet" href="./src/css/menure.css" />
+    <link rel="stylesheet" href="./src/css/chatbot.css" />
+    <link rel="website icon" href="./src/img/logo.jpg" />
+</head>
+
+<body class="bg-gray-900 min-h-screen">
+    <div id="Menu"></div><br><br><br>
+    <div id="bot"></div>
+    <div class="max-w-6xl text-white mx-auto mt-10 px-4">
+        <h1 class="text-3xl font-bold mb-4 text-yellow-400">🛒 Quản lý đơn hàng theo người dùng</h1>
+        <input id="search" type="text"
+            class="w-full mb-6 px-4 py-2 rounded-full bg-white/10 text-white placeholder-gray-300 border border-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="🔍 Tìm theo tên hoặc email..." />
+        <div id="UserList" class="space-y-6"></div>
+        <div class="mt-10 flex justify-center gap-4">
+            <button id="prevPage" class="px-4 py-2 bg-indigo-700 rounded hover:bg-indigo-800">〈 Trang trước</button>
+            <button id="nextPage" class="px-4 py-2 bg-indigo-700 rounded hover:bg-indigo-800">Trang sau 〉</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="./src/js/language.js" defer></script>
+    <script type="module" src="./src/js/toast.js"></script>
+    <script type="module" src="./src/js/firebase-config.js"></script>
+    <script src="./src/js/menu.js"></script>
+    <script type="module" src="./src/js/profile.js"></script>
+    <script type="module" src="./src/js/logout.js"></script>
+    <script type="module" src="./src/js/chatbot.js"></script>
+    <script type="module">
+        import { db } from './src/js/firebase-config.js';
+        import {
+            collection, query, orderBy, getDocs, getDoc, doc, updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { showToast } from './src/js/toast.js';
+
+        let usersWithOrders = [];
+        let currentPage = 1;
+        const usersPerPage = 15;
+
+        document.getElementById("search").addEventListener("input", () => {
+            currentPage = 1;
+            renderPage();
+        });
+
+        async function fetchData() {
+            const orderSnap = await getDocs(query(collection(db, "orders"), orderBy("date", "desc")));
+            const orders = {};
+            orderSnap.forEach(doc => {
+                const order = doc.data(); order.id = doc.id;
+                if (!orders[order.uid]) orders[order.uid] = [];
+                orders[order.uid].push(order);
+            });
+
+            const userSnap = await getDocs(collection(db, "users"));
+            usersWithOrders = userSnap.docs.map(doc => {
+                const user = doc.data();
+                const uid = doc.id;
+                const list = orders[uid] || [];
+
+                if (list.length === 0) return null; // ❗ Bỏ người không có đơn
+
+                const totalSpent = list.reduce((sum, o) =>
+                    o.status === "delivered"
+                        ? sum + o.items.reduce((s, i) => s + i.price * i.quantity, 0)
+                        : sum, 0
+                );
+
+                const highestPriority =
+                    list.some(o => o.status === "shipped") ? 1 :
+                        list.some(o => o.status === "processing") ? 2 :
+                            list.some(o => o.status === "pending") ? 3 : 4;
+
+                const latestOrderTime = list[0]?.date?.toMillis() || 0;
+
+                return {
+                    uid,
+                    name: user.name || user.email || "(Không rõ)",
+                    email: user.email || "",
+                    avatar: user.avatar || "",
+                    orders: list,
+                    totalSpent,
+                    highestPriority,
+                    latestOrderTime
+                };
+            })
+                .filter(Boolean) // ❗ Lọc bỏ phần tử null
+                .sort((a, b) => {
+                    if (a.highestPriority !== b.highestPriority) return a.highestPriority - b.highestPriority;
+                    return b.latestOrderTime - a.latestOrderTime;
+                });
+
+            renderPage();
+        }
+
+        function renderPage() {
+            const searchText = document.getElementById("search").value.toLowerCase();
+            const filtered = usersWithOrders.filter(user =>
+                user.name.toLowerCase().includes(searchText) || user.email.toLowerCase().includes(searchText)
+            );
+
+            const start = (currentPage - 1) * usersPerPage;
+            const end = start + usersPerPage;
+            const usersPage = filtered.slice(start, end);
+
+            const UserList = document.getElementById("UserList");
+            UserList.innerHTML = "";
+
+            usersPage.forEach(user => {
+                const summaryStats = user.orders.reduce((acc, o) => {
+                    acc[o.status] = (acc[o.status] || 0) + 1;
+                    return acc;
+                }, {});
+
+                const container = document.createElement("div");
+                container.className = "bg-gray-800 p-4 rounded-xl shadow-md";
+
+                const statsText = `(${user.orders.length} đơn: ${Object.entries(summaryStats).map(([s, c]) => `${getStatusEmoji(s)} ${c}`).join(", ")}) 💰 ${user.totalSpent.toLocaleString()} VND`;
+
+                container.innerHTML = `
+          <details open>
+            <summary class="cursor-pointer text-lg text-yellow-300 font-semibold flex items-center gap-3">
+              ${user.avatar ? `<img src="${user.avatar}" class="w-10 h-10 rounded-full border object-cover">` : ""}
+              <div>
+                👤 ${user.name} (${user.email})
+                <div class="text-sm text-gray-400 font-normal mt-1">${statsText}</div>
+              </div>
+            </summary>
+            <div class="mt-4 space-y-4">
+              ${user.orders.map(order => renderOrder(order)).join("")}
+            </div>
+          </details>
+        `;
+
+                UserList.appendChild(container);
+            });
+        }
+
+        function renderOrder(order) {
+            const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const date = order.date?.toDate().toLocaleString();
+            const status = order.status;
+            const cancelReason = order.cancelReason || "";
+            const phone = order.phone || "(không có)";
+            const address = order.address || "(không có)";
+
+            return `
+        <div class="bg-gray-700 rounded p-4">
+        <div class="text-sm text-gray-300 mb-2 space-y-1">
+            <div>🆔 <b>${order.id}</b></div>
+            <div>📅 Ngày đặt: ${date}</div>
+            <div>📞 SĐT: ${phone}</div>
+            <div>📍 Địa chỉ: ${address}</div>
+        </div>
+
+          ${order.items.map(i => `
+            <div class="flex gap-3 items-center mb-2">
+              <img src="${i.picture || './src/img/shapespeakicon.jpg'}" class="w-14 h-14 rounded object-cover" />
+              <div>
+                <p class="text-yellow-400 font-semibold">${i.name}</p>
+                <p class="text-gray-300 text-sm">x${i.quantity} • ${i.price.toLocaleString()} VND</p>
+              </div>
+            </div>`).join("")}
+          <div class="flex justify-between items-center mt-2">
+            <span class="font-bold">Tổng: ${total.toLocaleString()} VND</span>
+            <span class="text-sm px-3 py-1 rounded-full ${getStatusColor(status)}">${getStatusLabel(status)}</span>
+          </div>
+          ${status === "cancelled" && cancelReason ? `<p class="mt-2 text-red-400 italic">📌 Lý do hủy: ${cancelReason}</p>` : ""}
+          ${status !== "cancelled" && status !== "delivered" ? `
+            <div class="mt-4 flex gap-3 items-center">
+              <select id="status-${order.id}" class="bg-gray-600 text-white px-2 py-1 rounded">
+                <option value="pending" ${status === "pending" ? "selected" : ""}>⏳ Đang chờ</option>
+                <option value="processing" ${status === "processing" ? "selected" : ""}>🔧 Đang xử lý</option>
+                <option value="shipped" ${status === "shipped" ? "selected" : ""}>🚚 Đang giao</option>
+                <option value="delivered" ${status === "delivered" ? "selected" : ""}>✅ Đã giao</option>
+              </select>
+              <button onclick="window.updateStatus('${order.id}')" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded">Lưu</button>
+              <button onclick="window.cancelOrder('${order.id}')" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Hủy đơn</button>
+            </div>` : ""}
+        </div>`;
+        }
+
+        function getStatusLabel(status) {
+            return {
+                pending: "⏳ Đang chờ",
+                processing: "🔧 Đang xử lý",
+                shipped: "🚚 Đang giao",
+                delivered: "✅ Đã giao",
+                cancelled: "❌ Đã hủy"
+            }[status] || "❓";
+        }
+
+        function getStatusEmoji(status) {
+            return getStatusLabel(status).split(" ")[0];
+        }
+
+        function getStatusColor(status) {
+            return {
+                pending: "bg-yellow-600",
+                processing: "bg-indigo-600",
+                shipped: "bg-blue-600",
+                delivered: "bg-green-600",
+                cancelled: "bg-red-600"
+            }[status] || "bg-gray-600";
+        }
+
+        window.updateStatus = async function (orderId) {
+            const select = document.getElementById(`status-${orderId}`);
+            if (!select) return;
+            try {
+                await updateDoc(doc(db, "orders", orderId), {
+                    status: select.value,
+                });
+                showToast("✅ Đã cập nhật trạng thái", "success");
+                fetchData();
+            } catch (e) {
+                console.error(e);
+                showToast("❌ Lỗi khi cập nhật trạng thái", "error");
+            }
+        };
+
+        window.cancelOrder = async function (orderId) {
+            const reason = prompt("Nhập lý do hủy đơn hàng này:");
+            if (!reason || reason.trim() === "") {
+                alert("⚠️ Bạn phải nhập lý do.");
+                return;
+            }
+
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                const orderSnap = await getDoc(orderRef);
+
+                if (!orderSnap.exists()) {
+                    showToast("❌ Không tìm thấy đơn hàng!", "error");
+                    return;
+                }
+
+                const orderData = orderSnap.data();
+                const items = orderData.items || [];
+
+                // ✅ Hoàn lại stock cho từng sản phẩm
+                for (const item of items) {
+                    const productRef = doc(db, "shapespeakitems", item.id);
+                    const productSnap = await getDoc(productRef);
+                    if (productSnap.exists()) {
+                        const currentStock = productSnap.data().stock || 0;
+                        await updateDoc(productRef, {
+                            stock: currentStock + item.quantity,
+                        });
+                    }
+                }
+
+                // ✅ Cập nhật trạng thái & lý do
+                await updateDoc(orderRef, {
+                    status: "cancelled",
+                    cancelReason: reason.trim(),
+                });
+
+                showToast("🗑️ Đã hủy đơn và hoàn kho", "success");
+                fetchData();
+            } catch (e) {
+                console.error(e);
+                showToast("❌ Không thể hủy đơn", "error");
+            }
+        };
+
+
+        document.getElementById("prevPage").onclick = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        };
+        document.getElementById("nextPage").onclick = () => {
+            if (currentPage * usersPerPage < usersWithOrders.length) {
+                currentPage++;
+                renderPage();
+            }
+        };
+
+        fetchData();
+    </script>
+</body>
+
+</html>

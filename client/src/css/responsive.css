@@ -1,0 +1,67 @@
+/* products Responsive*/
+/* Responsive for tablets and smaller screens (less than 800px) */
+@media only screen and (max-width: 1280px) {
+    #Menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    #Menu1 {
+        display: none; /* Hide menu items */
+    }
+
+    #menu-toggle {
+        display: block;
+        background-color: #ffcc66;
+        color: white;
+		height: 35px;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #Menu1.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 76px;
+        left: 0;
+        width: 100%;
+        background-color: rgba(46, 46, 46, 0.911);
+        z-index: 1000;
+        padding: 10px;
+    }
+
+    #Menu1 a {
+        display: block;
+        padding: 10px;
+        text-align: center;
+    }
+	#form1{
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		color: white;
+		border-radius: 10px;
+		width: 350px;
+		height: 550px;
+	}
+	#form2{
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		color: white;
+		border-radius: 10px;
+		padding: 10px;
+		height: 550px;
+	}
+}
+
+/* Ensure menu button appears only for small screens */
+@media only screen and (min-width: 801px) {
+    #menu-toggle {
+        display: none;
+    }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="website icon" type="image/png" href="./src/img/logo.jpg">
+  <link rel="stylesheet" href="./src/css/styles.css">
+  <link rel="stylesheet" href="./src/css/menure.css">
+  <link rel="stylesheet" href="./src/css/toast.css">
+  <link rel="stylesheet" href="./src/css/chatbot.css">
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #4f46e5;
+      border-radius: 10px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class=" min-h-screen">
+  <img id="background-img" src="./src/img/background.webp" alt="background">
+
+  <div id="Menu"></div>
+  <div id="bot"></div>
+
+  <div id="CartList" class="max-w-3xl mx-auto mt-28 px-4 space-y-5"></div>
+
+  <div id="CartSummary" class="max-w-3xl mx-auto mt-8 px-4 hidden">
+    <div class="bg-gray-800 p-4 rounded-lg shadow-md text-white flex justify-between items-center">
+      <span class="text-lg font-semibold" data-i18n="cart.total">Total:</span>
+      <span id="TotalAmount" class="text-yellow-400 text-xl font-bold">0 VND</span>
+      <button onclick="checkoutAll()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2 rounded-full ml-4"
+        data-i18n="cart.checkoutAll">
+        Pay out
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"
+    class="fixed top-20 right-4 md:right-4 left-4 md:left-auto z-[1100] space-y-2 max-w-xs w-full mx-auto md:mx-0">
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="./src/js/language.js" defer></script>
+  <script type="module" src="./src/js/toast.js"></script>
+
+  <script type="module" src="./src/js/firebase-config.js"></script>
+  <script src="./src/js/menu.js"></script>
+  <script type="module" src="./src/js/profile.js"></script>
+  <script type="module" src="./src/js/logout.js"></script>
+  <script type="module" src="./src/js/cart.js"></script>
+  <script type="module" src="./src/js/chatbot.js"></script>
+  <script type="module">
+    import { enableSessionKeepAlive } from "./src/js/session-keeper.js";
+    enableSessionKeepAlive();
+  </script>
+</body>
+
+</html>

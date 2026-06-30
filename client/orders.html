@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="orders.title">My Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="./src/css/styles.css" />
+    <link rel="stylesheet" href="./src/css/toast.css" />
+    <link rel="stylesheet" href="./src/css/menure.css" />
+    <link rel="stylesheet" href="./src/css/chatbot.css" />
+    <link rel="website icon" href="./src/img/logo.jpg" />
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 10px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class=" min-h-screen">
+    <img id="background-img" src="./src/img/background.webp" alt="background">
+
+    <div id="Menu"></div>
+    <div id="bot"></div>
+
+    <div class="max-w-3xl mx-auto mt-28 px-4 text-white">
+        <div id="OrderList" class="space-y-5"></div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"
+        class="fixed top-20 right-4 md:right-4 left-4 md:left-auto z-[1100] space-y-2 max-w-xs w-full mx-auto md:mx-0">
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="./src/js/language.js" defer></script>
+    <script type="module" src="./src/js/toast.js"></script>
+    <script type="module" src="./src/js/firebase-config.js"></script>
+    <script src="./src/js/menu.js"></script>
+    <script type="module" src="./src/js/profile.js"></script>
+    <script type="module" src="./src/js/logout.js"></script>
+    <script type="module" src="./src/js/chatbot.js"></script>
+    <script type="module">
+        import { enableSessionKeepAlive } from "./src/js/session-keeper.js";
+        enableSessionKeepAlive();
+    </script>
+
+    <!-- Orders script -->
+    <script type="module">
+        import { db } from './src/js/firebase-config.js';
+        import { setLanguage, getTranslation } from './src/js/language.js';
+        import {
+            collection, query, where, onSnapshot, orderBy
+        } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        //import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { showToast } from './src/js/toast.js';
+
+        const OrderList = document.getElementById("OrderList");
+        const exchangeRate = 24000;
+
+        function getCurrency() {
+            return localStorage.getItem("currency") || "VND";
+        }
+
+        function formatCurrency(amount) {
+            const currency = getCurrency();
+            return currency === "USD"
+                ? `$${(amount / exchangeRate).toFixed(2)}`
+                : amount.toLocaleString("vi-VN") + " VND";
+        }
+
+
+        async function getStatusLabel(status) {
+            switch (status) {
+                case "pending": return await getTranslation("orders.status.pending");
+                case "processing": return await getTranslation("orders.status.processing");
+                case "shipped": return await getTranslation("orders.status.shipped");
+                case "delivered": return await getTranslation("orders.status.delivered");
+                case "cancelled": return await getTranslation("orders.status.cancelled");
+                default: return await getTranslation("orders.status.unknown");
+            }
+        }
+
+        async function renderOrders(snapshot) {
+            OrderList.innerHTML = "";
+
+            if (snapshot.empty) {
+                const emptyText = await getTranslation("orders.empty");
+                OrderList.innerHTML = `
+      <div class="bg-gray-800 p-6 rounded-lg text-center text-gray-300">
+        <p data-i18n="orders.empty">${emptyText}</p>
+      </div>
+    `;
+                return;
+            }
+
+            for (const docSnap of snapshot.docs) {
+                const order = docSnap.data();
+                const orderId = docSnap.id;
+                const total = order.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+                const date = order.date?.toDate().toLocaleString() || "(chưa rõ)";
+                const statusLabel = await getStatusLabel(order.status);
+
+                const itemList = order.items.map(item => `
+      <div class="flex items-center gap-4 mb-2">
+        <img src="${item.picture || './src/img/shapespeakicon.jpg'}" class="w-16 h-16 object-cover rounded-md" />
+        <div class="text-sm">
+          <p class="text-yellow-400 font-semibold">${item.name}</p>
+          <p class="text-gray-300">x${item.quantity} • ${formatCurrency(item.price)}</p>
+        </div>
+      </div>
+    `).join("");
+
+                const statusColor = {
+                    pending: "bg-yellow-600",
+                    processing: "bg-indigo-600",
+                    shipped: "bg-blue-600",
+                    delivered: "bg-green-600",
+                    cancelled: "bg-red-600"
+                }[order.status] || "bg-gray-600";
+
+                const progress = {
+                    pending: "20%",
+                    processing: "50%",
+                    shipped: "80%",
+                    delivered: "100%",
+                    cancelled: "0%"
+                }[order.status] || "0%";
+
+                const cancelReasonText = await getTranslation("orders.cancel_reason");
+
+                const orderEl = document.createElement("div");
+                orderEl.className = "relative bg-gray-800 p-4 rounded-lg shadow-md";
+                orderEl.innerHTML = `
+      <div class="mb-2 text-sm text-gray-400">
+        <p>🆔 <span class="text-white"><span data-i18n="orders.productID">Mã đơn:</span> ${orderId}</span></p>
+        <p>📅 <span data-i18n="orders.date">Ngày đặt:</span> ${date}</p>
+        <p>📞 <span data-i18n="myaccount.phone">SĐT</span>: ${order.phone || "(không có)"}</p>
+        <p>📍 <span data-i18n="myaccount.address">Địa chỉ</span>: ${order.address || "(không có)"}</p>
+      </div>
+      ${itemList}
+
+      <div class="mt-2 flex justify-between items-center">
+        <span class="text-white font-semibold"><span data-i18n="cart.total">Tổng cộng:</span> ${formatCurrency(total)}</span>
+        <span class="px-3 py-1 text-sm rounded-full font-medium ${statusColor}">${statusLabel}</span>
+      </div>
+
+      <div class="w-full h-2 mt-2 bg-gray-700 rounded">
+        <div class="h-2 rounded bg-yellow-400 transition-all duration-500" style="width: ${progress}"></div>
+      </div>
+
+      ${order.status === "cancelled" && order.cancelReason
+                        ? `<div class="mt-2 text-sm text-red-400">
+            💬 <strong>${cancelReasonText}:</strong> ${order.cancelReason}
+          </div>`
+                        : ""}
+    `;
+
+                // Nếu được huỷ
+                if (order.status === "pending") {
+                    orderEl.innerHTML += `
+        <button onclick="cancelOrder('${orderId}')" title="Hủy đơn hàng"
+        class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-lg z-10">
+        <i class="fa-solid fa-trash"></i>
+        </button>`;
+                }
+
+                OrderList.appendChild(orderEl);
+            }
+        }
+
+
+        window.cancelOrder = async function (orderId) {
+            if (!confirm("Bạn có chắc muốn hủy đơn hàng này?")) return;
+
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                const orderSnap = await getDoc(orderRef);
+
+                if (!orderSnap.exists()) {
+                    showToast("❌ Không tìm thấy đơn hàng!", "error");
+                    return;
+                }
+
+                const orderData = orderSnap.data();
+                const items = orderData.items || [];
+
+                // 🔁 Cộng lại stock cho từng sản phẩm
+                for (const item of items) {
+                    const productRef = doc(db, "shapespeakitems", item.id);
+                    const productSnap = await getDoc(productRef);
+
+                    if (productSnap.exists()) {
+                        const currentStock = productSnap.data().stock || 0;
+                        await updateDoc(productRef, {
+                            stock: currentStock + item.quantity
+                        });
+                    }
+                }
+
+                // 🛑 Cập nhật trạng thái đơn hàng
+                await updateDoc(orderRef, {
+                    status: "cancelled"
+                });
+
+                showToast("🗑️ Đơn hàng đã được hủy và hoàn kho.", "success");
+            } catch (err) {
+                console.error("❌ Lỗi khi hủy đơn hàng:", err);
+                showToast("Không thể hủy đơn hàng. Vui lòng thử lại.", "error");
+            }
+        };
+
+        const auth = getAuth();
+        onAuthStateChanged(auth, user => {
+            if (!user) {
+                showToast("⚠️ Vui lòng đăng nhập để xem đơn hàng.", "warning");
+                return;
+            }
+
+            const q = query(
+                collection(db, "orders"),
+                where("uid", "==", user.uid),
+                orderBy("date", "desc")
+            );
+
+            onSnapshot(q, renderOrders);
+        });
+
+        document.addEventListener("languageChanged", () => {
+            const lang = localStorage.getItem("lang") || "en";
+            setLanguage(lang);
+        });
+    </script>
+</body>
+
+</html>

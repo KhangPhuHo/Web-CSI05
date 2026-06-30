@@ -1,0 +1,168 @@
+{
+  "toast": {
+    "session_expired": "Your session has expired. Please log in again.",
+    "cart_empty": "🛒 Your cart is empty.",
+    "confirm_buy": "🛒 Are you sure you want to buy {qty} x {name} ({total})?",
+    "confirm_checkout": "💳 Are you sure to checkout {count} items for a total of {total}?",
+    "login_required": "⚠️ Please log in to continue.",
+    "missing_user": "❌ User info not found.",
+    "missing_contact": "⚠️ Please update your phone and address.",
+    "product_not_found": "❌ Product \"{name}\" not found.",
+    "insufficient_stock": "⚠️ Product \"{name}\" has only {stock} left.",
+    "order_created": "✅ Order created for \"{name}\".",
+    "order_created_all": "✅ Order created with {count} items.",
+    "order_error": "❌ Failed to create order.",
+    "max_stock_reached": "Product \"{name}\" only has {stock} left in stock."
+  },
+  "common": {
+    "try_again_error": "Something went wrong. Please try again later.",
+    "confirm_password_prompt": "Enter your password to confirm:",
+    "password_required": "You didn't enter a password.",
+    "unsupported_login_method": "This login method is not supported.",
+    "account_deleted": "Your account has been permanently deleted.",
+    "google_cancelled": "Google reauthentication was cancelled.",
+    "wrong_password": "Incorrect password.",
+    "account_delete_error": "Could not delete account. Please try again.",
+    "logout_success": "Successfully logged out.",
+    "logout_error": "Error during logout."
+  },
+  "admin": {
+    "need_login_again": "You need to log in again to access this page.",
+    "no_permission": "You do not have permission to access this page.",
+    "error": "An error occurred. Please try again later."
+  },
+  "menu": {
+    "home": "Home",
+    "news": "News",
+    "store": "Store",
+    "language": "Language",
+    "my_account": "My Account",
+    "cart": "Cart",
+    "orders": "Orders",
+    "logout": "Logout",
+    "sign_in": "Signin/Login",
+    "no_account": "No account"
+  },
+  "modal": {
+    "confirm_title": "Confirm Account Deletion",
+    "confirm_text": "Are you sure you want to delete your account? This action is irreversible.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "language": {
+    "language_title": "Language",
+    "choose_language": "Choose your language"
+  },
+  "news": {
+    "created": "Created:",
+    "updated": "Updated:",
+    "author": "Author:",
+    "sort_newest": "Newest First",
+    "sort_oldest": "Oldest First",
+    "loading": "Loading news for you...",
+    "information": "More information",
+    "placeholder": "Search for the new..."
+  },
+  "store": {
+    "price": "Price:",
+    "stock": "Stock:",
+    "add_to_cart": "Add To Cart",
+    "intro": "Introduction",
+    "no_intro": "(Doesn't have any information)",
+    "error_intro": "(Can't loading any information)",
+    "loading": "Loading toys for you...",
+    "information": "More information",
+    "placeholder": "Search for a product...",
+    "filter_price": "Filter Price",
+
+    "invalid_quantity": "Invalid quantity.",
+    "limit_quantity": "You can only buy up to {max} more.",
+    "added_quantity": "Added {qty} x {name} to cart.",
+    "added_to_cart": "🌟 Added \"{name}\" to cart!"
+  },
+  "myaccount": {
+    "my_account_title": "My Account",
+    "update_info": "Update Your Info",
+    "name": "Name",
+    "email": "Email",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "phone": "Phone Number",
+    "address": "Address",
+    "avatar": "Avatar (URL)",
+    "submit": "Submit",
+    "your_profile": "Your Profile",
+
+    "load_error": "Failed to load your account information.",
+    "guest_view_notice": "You are viewing as a guest. Please log in to edit!",
+    "invalid_phone": "Invalid phone number. Please enter a valid Vietnamese format!",
+    "invalid_address": "Address must include: house number, street, ward/commune, district, city/province.",
+    "password_required_for_update": "You must enter your password to update email or password.",
+    "update_success": "Profile updated successfully!",
+    "update_error": "Profile update failed. Please try again."
+  },
+  "cart": {
+    "buy": "Buy",
+    "delete": "Delete",
+    "price": "Price:",
+    "stock": "Stock:",
+    "total": "Total:",
+    "empty": "You don't have any goods yet.",
+    "checkoutAll": "Pay out"
+  },
+  "footer": {
+    "slogan": "TOY FOR CHILDREN",
+    "contact": "Contact Us",
+    "find_us": "Find Us",
+    "copyright": "2026 BookStore. All rights reserved."
+  },
+  "rating": {
+    "vote_singular": "vote",
+    "vote_plural": "votes",
+    "no_review": "No reviews yet",
+
+    "login_required": "You need to log in to rate!",
+    "thank_you": "🎉 Thank you! Your rating has been recorded."
+  },
+  "orders": {
+    "empty": "You don't have any orders yet.",
+    "productID": "productID:",
+    "date": "Date Created:",
+    "status": {
+      "pending": "⏳ Pending Confirmation",
+      "processing": "🔧 Processing",
+      "shipped": "🚚 Shipped",
+      "delivered": "✅ Delivered",
+      "cancelled": "❌ Cancelled",
+      "unknown": "❓Unknown"
+    },
+    "cancel_reason": "Reason for cancellation"
+  },
+  "login": {
+    "google": {
+      "popup_closed": "You closed the login window.",
+      "account_exists": "An account already exists with a different sign-in method.",
+      "network_failed": "Network connection failed. Please check your Internet.",
+      "default_error": "An error occurred during Google login. Please try again later.",
+      "success": "Google login successful."
+    },
+    "login_title": "Login",
+    "wel_back": "Welcome Back!",
+    "password": "Password",
+    "login": "Login",
+    "verify_password": "Verify Password",
+    "haven't": "Don't have an account?",
+    "register": "Register",
+    "or": "OR",
+    "google_login": "Login with Google",
+    "join_us": "Join Us!",
+    "username": "Username",
+    "have_account": "Already have an account?",
+    "fill_all_fields": "Please fill in all fields.",
+    "password_mismatch": "Passwords do not match.",
+    "signup_success": "Signup successful!",
+    "signup_failed": "Signup failed. Please try again.",
+    "login_success": "Login successful!",
+    "login_failed": "Login failed. Try again."
+  }
+}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Sản phẩm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="website icon" type="image/png" href="./src/img/logo.jpg">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./src/css/styles.css">
+    <link rel="stylesheet" href="./src/css/menure.css">
+    <link rel="stylesheet" href="./src/css/toast.css">
+    <link rel="stylesheet" href="./src/css/index.css">
+    <link rel="stylesheet" href="./src/css/chatbot.css">
+</head>
+
+<body>
+    <div id="Menu"></div><br><br><br>
+    <div id="bot"></div>
+    <div id="wrapper">
+        <h1 class="text-2xl font-bold text-center text-indigo-600">Danh sách Sản Phẩm</h1>
+        <button id="themmoi" onclick="openModal()">+ Thêm mới sản phẩm</button>
+        <div id="tableinfo" style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Chi tiết</th>
+                        <th>Giá</th>
+                        <th>Số lượng</th>
+                        <th>Giới thiệu</th>
+                        <th>Action</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody id="content"></tbody>
+            </table>
+        </div>
+
+        <!--form thêm mới sản phẩm-->
+        <div class="modal" id="productModal">
+            <div class="modal-content">
+                <button onclick="closeModal()"
+                    class="absolute top-3 right-3 w-10 h-10 bg-red-400 hover:bg-red-500 text-white rounded-full shadow-md flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <h2>Tạo Sản Phẩm Mới</h2>
+                <form id="form-new-product">
+                    <div class="form-group">
+                        <label for="picture">Hình ảnh</label>
+                        <img id="preview-picture-new" src="" alt="Ảnh hiện tại"
+                            style="max-width: 200px; margin-bottom: 10px; display: none;" />
+                        <input type="file" accept="image/*" id="picture" name="picture" />
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Tên sản phẩm</label>
+                        <input type="text" id="name" name="name" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="details">Chi tiết sản phẩm</label>
+                        <input type="text" id="details" name="details" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Giá</label>
+                        <input type="number" id="price" name="price" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Số lượng</label>
+                        <input type="number" id="stock" name="stock" required />
+                    </div>
+                    <button type="submit">Tạo sản phẩm</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Form sửa sản phẩm -->
+        <div class="modal" id="productModal2">
+            <div class="modal-content">
+                <button onclick="closeModal2()"
+                    class="absolute top-3 right-3 w-10 h-10 bg-red-400 hover:bg-red-500 text-white rounded-full shadow-md flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <h2>Chỉnh sửa sản phẩm</h2>
+                <form id="form-edit-product" onsubmit="updateProduct(event)">
+                    <div class="form-group">
+                        <label for="edit-picture">Hình ảnh</label>
+                        <img id="preview-picture-edit" src="" alt="Ảnh hiện tại"
+                            style="max-width: 200px; margin-bottom: 10px;" />
+                        <input type="file" accept="image/*" id="edit-picture" name="picture" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Tên sản phẩm</label>
+                        <input type="text" id="edit-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="details">Chi tiết sản phẩm</label>
+                        <input type="text" id="edit-details" name="details" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Giá</label>
+                        <input type="number" id="edit-price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Số lượng</label>
+                        <input type="number" id="edit-stock" name="stock" required>
+                    </div>
+                    <button id="submit" type="submit">Xác nhận sửa sản phẩm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-[1100] space-y-2 max-w-xs w-full md:w-auto mx-auto md:mx-0">
+    </div>
+
+    <!--file này phải có trước để load ngôn ngữ-->
+    <script type="module" src="./src/js/language.js" defer></script>
+    <script type="module" src="./src/js/toast.js"></script>
+    <script type="module" src="./src/js/check-admin.js"></script>
+
+    <script type="module" src="./src/js/firebase-config.js"></script>
+    <script src="./src/js/menu.js"></script>
+    <script type="module" src="./src/js/profile.js"></script>
+    <script type="module" src="./src/js/logout.js"></script>
+
+    <script type="module" src="./src/js/index.js"></script>
+    <script type="module" src="./src/js/chatbot.js"></script>
+    <script>
+        function closeModal() {
+            document.getElementById("productModal").style.display = "none";
+        }
+        function openModal() {
+            document.getElementById("productModal").style.display = "block";
+        }
+        // Khi mở modal chỉnh sửa sản phẩm, cần lưu ID sản phẩm để cập nhật đúng mục
+        function openModal2(productId) {
+            document.getElementById('edit-name').dataset.productId = productId;
+            document.getElementById('productModal2').style.display = "block";
+        }
+
+        function closeModal2() {
+            document.getElementById('productModal2').style.display = "none";
+        }
+
+        // Hiển thị ảnh preview khi tạo mới sản phẩm
+        // Xử lý ảnh preview trong modal tạo mới sản phẩm
+        const newPictureInput = document.getElementById('picture');
+        const newPreviewImg = document.getElementById('preview-picture-new');
+
+        newPictureInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    newPreviewImg.src = e.target.result;
+                    newPreviewImg.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                newPreviewImg.src = "";
+                newPreviewImg.style.display = 'none';
+            }
+        });
+
+        // Xử lý ảnh preview trong modal chỉnh sửa sản phẩm
+        const editPictureInput = document.getElementById('edit-picture');
+        const editPreviewImg = document.getElementById('preview-picture-edit');
+
+        editPictureInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    editPreviewImg.src = e.target.result;
+                    editPreviewImg.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                editPreviewImg.src = "";
+                editPreviewImg.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+
+</html>
