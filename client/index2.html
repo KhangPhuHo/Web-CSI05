@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách Sản phẩm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="website icon" type="image/png" href="./src/img/shapespeakicon.jpg">
+    <link rel="website icon" type="image/png" href="./src/img/logo.jpg">
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="./src/css/menure.css">
     <link rel="stylesheet" href="./src/css/toast.css">
     <link rel="stylesheet" href="./src/css/index.css">
-    <link rel="stylesheet" href="./src/css/multiplemedia.css">
     <link rel="stylesheet" href="./src/css/chatbot.css">
 </head>
 
@@ -22,8 +21,7 @@
     <div id="Menu"></div><br><br><br>
     <div id="bot"></div>
     <div id="wrapper">
-        <!--Danh sách thêm mới sản phẩm -->
-        <h1 class="text-2xl font-bold text-center text-pink-300">Danh sách Sản Phẩm</h1>
+        <h1 class="text-2xl font-bold text-center text-indigo-600">Danh sách Sản Phẩm</h1>
         <button id="themmoi" onclick="openModal()">+ Thêm mới sản phẩm</button>
         <div id="tableinfo" style="overflow-x:auto;">
             <table>
@@ -34,7 +32,6 @@
                         <th>Chi tiết</th>
                         <th>Giá</th>
                         <th>Số lượng</th>
-                        <th>Danh mục</th>
                         <th>Giới thiệu</th>
                         <th>Action</th>
                         <th>Edit</th>
@@ -55,18 +52,11 @@
                 <h2>Tạo Sản Phẩm Mới</h2>
                 <form id="form-new-product">
                     <div class="form-group">
-                        <label for="picture">Hình ảnh thumnail</label>
+                        <label for="picture">Hình ảnh</label>
                         <img id="preview-picture-new" src="" alt="Ảnh hiện tại"
                             style="max-width: 200px; margin-bottom: 10px; display: none;" />
                         <input type="file" accept="image/*" id="picture" name="picture" />
                     </div>
-
-                    <div class="form-group">
-                        <label for="mediaFiles">Ảnh & Video phụ</label>
-                        <input type="file" id="mediaFiles" name="media" accept="image/*,video/*" multiple />
-                        <div id="mediaPreview" class="flex flex-wrap gap-2 mt-2"></div>
-                    </div>
-
                     <div class="form-group">
                         <label for="name">Tên sản phẩm</label>
                         <input type="text" id="name" name="name" required />
@@ -82,54 +72,6 @@
                     <div class="form-group">
                         <label for="stock">Số lượng</label>
                         <input type="number" id="stock" name="stock" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Danh mục</label>
-                        <div class="relative inline-block w-64" id="multi-select-category">
-                            <button id="dropdownToggle" type="button"
-                                class="w-full bg-white border border-gray-300 rounded px-4 py-2 text-left flex justify-between items-center">
-                                <span id="selectedText">Chọn danh mục</span>
-                                <svg class="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-
-                            <ul id="dropdownMenu"
-                                class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded shadow-md hidden max-h-60 overflow-auto">
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="đồ chơi" class="category-option" />
-                                        <span>Đồ chơi</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="giáo dục" class="category-option" />
-                                        <span>Giáo dục</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="toán" class="category-option" />
-                                        <span>Toán học</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="game" class="category-option" />
-                                        <span>Game</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="thẻ" class="category-option" />
-                                        <span>Thẻ</span>
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                     <button type="submit">Tạo sản phẩm</button>
                 </form>
@@ -147,16 +89,10 @@
                 <h2>Chỉnh sửa sản phẩm</h2>
                 <form id="form-edit-product" onsubmit="updateProduct(event)">
                     <div class="form-group">
-                        <label for="edit-picture">Hình ảnh thumnail</label>
+                        <label for="edit-picture">Hình ảnh</label>
                         <img id="preview-picture-edit" src="" alt="Ảnh hiện tại"
                             style="max-width: 200px; margin-bottom: 10px;" />
                         <input type="file" accept="image/*" id="edit-picture" name="picture" />
-                    </div>
-                    
-                    <div id="form-group">
-                        <label for="edit-mediaFiles">Ảnh & Video phụ</label>
-                        <input type="file" id="edit-mediaFiles" name="media" accept="image/*,video/*" multiple />
-                        <div id="edit-mediaPreview" class="flex flex-wrap gap-2 mt-2"></div>
                     </div>
 
                     <div class="form-group">
@@ -175,55 +111,6 @@
                         <label for="stock">Số lượng</label>
                         <input type="number" id="edit-stock" name="stock" required>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-category">Danh mục</label>
-                        <div class="relative w-full" id="multi-select-edit-category">
-                            <button id="editCategoryDropdownBtn" type="button"
-                                class="w-full bg-white border border-gray-300 rounded px-4 py-2 text-left flex justify-between items-center">
-                                <span id="editCategorySelectedText">Chọn danh mục</span>
-                                <svg class="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-
-                            <ul id="editCategoryDropdown"
-                                class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded shadow-md hidden max-h-60 overflow-auto">
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="đồ chơi" class="edit-category-option" />
-                                        <span>Đồ chơi</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="giáo dục" class="edit-category-option" />
-                                        <span>Giáo dục</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="toán" class="edit-category-option" />
-                                        <span>Toán học</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="game" class="edit-category-option" />
-                                        <span>Game</span>
-                                    </label>
-                                </li>
-                                <li class="p-2 hover:bg-gray-100">
-                                    <label class="flex items-center space-x-2">
-                                        <input type="checkbox" value="thẻ" class="edit-category-option" />
-                                        <span>Thẻ</span>
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
                     <button id="submit" type="submit">Xác nhận sửa sản phẩm</button>
                 </form>
             </div>
@@ -244,10 +131,6 @@
     <script type="module" src="./src/js/logout.js"></script>
 
     <script type="module" src="./src/js/index.js"></script>
-    <script type="module">
-        import { addToCart } from './src/js/cart-utils.js';
-        window.addToCart = addToCart;
-    </script>
     <script type="module" src="./src/js/chatbot.js"></script>
     <script>
         function closeModal() {
@@ -306,7 +189,6 @@
         });
 
     </script>
-    <script type="module" src="./src/js/multiplemedia.js"></script>
 </body>
 
 </html>
