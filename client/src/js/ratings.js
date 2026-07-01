@@ -37,7 +37,7 @@ export function loadRatingUI(productId) {
   popup.appendChild(container);
 
   // Listen to updates
-  const ratingsRef = collection(db, `shapespeakitems/${productId}/ratings`);
+  const ratingsRef = collection(db, `products/${productId}/ratings`);
   onSnapshot(ratingsRef, snap => {
   (async () => {
     const ratings = snap.docs.map(doc => doc.data());
@@ -66,7 +66,7 @@ export function loadRatingUI(productId) {
   onAuthStateChanged(auth, async user => {
     if (!user) return;
 
-    const userRatingDoc = doc(db, `shapespeakitems/${productId}/ratings`, user.uid);
+    const userRatingDoc = doc(db, `products/${productId}/ratings`, user.uid);
     const userSnap = await getDoc(userRatingDoc);
     if (userSnap.exists()) {
       const userRating = userSnap.data().rating;
@@ -88,7 +88,7 @@ async function submitRating(productId, ratingValue) {
     return;
   }
 
-  const ratingRef = doc(db, `shapespeakitems/${productId}/ratings`, user.uid);
+  const ratingRef = doc(db, `products/${productId}/ratings`, user.uid);
   await setDoc(ratingRef, {
     rating: ratingValue,
     uid: user.uid,

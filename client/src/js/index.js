@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadProducts(container) {
   let htmls = "";
   try {
-    const querySnapshot = await getDocs(collection(db, "shapespeakitems"));
+    const querySnapshot = await getDocs(collection(db, "products"));
     if (querySnapshot.empty) {
       container.innerHTML = "<tr><td colspan='5'>Không có sản phẩm nào.</td></tr>";
       return;
@@ -74,7 +74,7 @@ async function loadProducts(container) {
 window.deleteProduct = async (productId) => {
   if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
     try {
-      await deleteDoc(doc(db, "shapespeakitems", productId));
+      await deleteDoc(doc(db, "products", productId));
       showToast("✅ Đã xóa sản phẩm!", "success");
       loadProducts(document.getElementById("content"));
     } catch (error) {
@@ -87,7 +87,7 @@ window.deleteProduct = async (productId) => {
 // ✅ Lấy 1 sản phẩm
 window.getOneProduct = async (productId) => {
   try {
-    const docSnap = await getDoc(doc(db, "shapespeakitems", productId));
+    const docSnap = await getDoc(doc(db, "products", productId));
     if (docSnap.exists()) {
       const productItem = docSnap.data();
       if (productItem.picture) {
@@ -138,7 +138,7 @@ window.updateProduct = async (event) => {
   }
 
   try {
-    await updateDoc(doc(db, "shapespeakitems", productID), productDataUpdate);
+    await updateDoc(doc(db, "products", productID), productDataUpdate);
     showToast("✅ Cập nhật thành công!", "success");
     closeModal2();
     loadProducts(document.getElementById("content"));
@@ -151,7 +151,7 @@ window.updateProduct = async (event) => {
 // ✅ Thêm sản phẩm mới
 async function AddProduct(newProduct) {
   try {
-    await addDoc(collection(db, "shapespeakitems"), newProduct);
+    await addDoc(collection(db, "products"), newProduct);
     showToast("✅ Thêm sản phẩm thành công!", "success");
     loadProducts(document.getElementById("content"));
   } catch (error) {

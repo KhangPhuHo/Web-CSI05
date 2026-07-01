@@ -207,7 +207,7 @@
 
                 // 🔁 Cộng lại stock cho từng sản phẩm
                 for (const item of items) {
-                    const productRef = doc(db, "shapespeakitems", item.id);
+                    const productRef = doc(db, "products", item.id);
                     const productSnap = await getDoc(productRef);
 
                     if (productSnap.exists()) {

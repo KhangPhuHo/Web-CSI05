@@ -34,11 +34,11 @@ function listenToProductRatings() {
   loadingDiv.classList.remove("hidden");
   productList.innerHTML = "";
 
-  getDocs(collection(db, "shapespeakitems")).then(snapshot => {
+  getDocs(collection(db, "products")).then(snapshot => {
     products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     products.forEach(product => {
-      const ratingsRef = collection(db, `shapespeakitems/${product.id}/ratings`);
+      const ratingsRef = collection(db, `products/${product.id}/ratings`);
 
       onSnapshot(ratingsRef, snap => {
         const ratings = snap.docs.map(d => d.data());

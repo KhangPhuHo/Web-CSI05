@@ -196,7 +196,7 @@ async function buyNow(index) {
     }
 
     // ✅ Kiểm tra tồn kho sản phẩm
-    const productRef = doc(db, "shapespeakitems", product.id);
+    const productRef = doc(db, "products", product.id);
     const productSnap = await getDoc(productRef);
     if (!productSnap.exists()) throw new Error(`Không tìm thấy sản phẩm ${product.name}`);
 
@@ -295,7 +295,7 @@ async function checkoutAll() {
 
     // 🔁 Check từng sản phẩm
     for (const item of cart) {
-      const productRef = doc(db, "shapespeakitems", item.id);
+      const productRef = doc(db, "products", item.id);
       const productSnap = await getDoc(productRef);
 
       if (!productSnap.exists()) {

@@ -37,7 +37,7 @@ async function fetchProducts() {
   loadingDiv.classList.remove("hidden");
   productList.innerHTML = "";
 
-  const querySnapshot = await getDocs(collection(db, "shapespeaknews"));
+  const querySnapshot = await getDocs(collection(db, "news"));
   products = [];
 
   querySnapshot.forEach((doc) => {

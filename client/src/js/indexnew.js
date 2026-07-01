@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadProducts(container) {
   let htmls = "";
   try {
-    const q = query(collection(db, "shapespeaknews"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
@@ -79,7 +79,7 @@ async function loadProducts(container) {
 window.deleteProduct = async (newsId) => {
   if (confirm("Bạn có chắc chắn muốn xóa bài báo này?")) {
     try {
-      await deleteDoc(doc(db, "shapespeaknews", newsId));
+      await deleteDoc(doc(db, "news", newsId));
       showToast("✅ Đã xóa bài báo!", "success");
       loadProducts(document.getElementById("content"));
     } catch (error) {
@@ -92,7 +92,7 @@ window.deleteProduct = async (newsId) => {
 // ✅ Lấy chi tiết bài báo
 window.getOneProduct = async (newsId) => {
   try {
-    const docSnap = await getDoc(doc(db, "shapespeaknews", newsId));
+    const docSnap = await getDoc(doc(db, "news", newsId));
     if (docSnap.exists()) {
       const data = docSnap.data();
       document.getElementById("preview-picture-edit").src = data.picture || "../img/shapespeakicon.jpg";
@@ -141,7 +141,7 @@ window.updateProduct = async (event) => {
   }
 
   try {
-    await updateDoc(doc(db, "shapespeaknews", newsId), updatedData);
+    await updateDoc(doc(db, "news", newsId), updatedData);
     showToast("✅ Cập nhật bài báo thành công!", "success");
     closeModal2();
     loadProducts(document.getElementById("content"));
@@ -154,7 +154,7 @@ window.updateProduct = async (event) => {
 // ✅ Thêm bài báo mới
 async function AddProduct(newProduct) {
   try {
-    await addDoc(collection(db, "shapespeaknews"), {
+    await addDoc(collection(db, "news"), {
       ...newProduct,
       createdAt: serverTimestamp(),
     });
