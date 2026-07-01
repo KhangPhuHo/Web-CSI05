@@ -12,17 +12,17 @@ function renderMenu() {
       <button id="menu-toggle" class="md:hidden text-xl">
         <i class="fa fa-bars"></i>
       </button>
-      <a href="home.html" class="flex items-center text-indigo-700 font-extrabold space-x-2">
+      <a href="home.html" class="flex items-center text-blue-400 font-extrabold space-x-2">
         <img src="./src/img/logo.jpg" class="w-10 h-10 aspect-square rounded-full object-cover" alt="shapespeak">
-        <span class="text-lg md:text-xl">ShapeSpeak</span>
+        <span class="text-lg md:text-xl">BookStore</span>
       </a>
 
       <!-- Menu Desktop -->
       <nav id="Menu1" class="hidden md:flex space-x-6 text-gray-700 text-base font-medium items-center">
-        <a href="home.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-home"></i><span data-i18n="menu.home">Home</span></a>
-        <a href="news.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-newspaper"></i><span data-i18n="menu.news">News</span></a>
-        <a href="store.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="menu.store">Store</span></a>
-        <a href="Language.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-globe"></i><span data-i18n="menu.language">Language</span></a>
+        <a href="home.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-home"></i><span data-i18n="menu.home">Home</span></a>
+        <a href="news.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-newspaper"></i><span data-i18n="menu.news">News</span></a>
+        <a href="store.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="menu.store">Store</span></a>
+        <a href="Language.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-globe"></i><span data-i18n="menu.language">Language</span></a>
       </nav>
 
       <!-- Profile + Popup -->
@@ -30,19 +30,19 @@ function renderMenu() {
       <div id="popup"
         class="hidden absolute right-4 top-16 max-w-xs bg-white border rounded-lg shadow-lg z-50 p-4 flex flex-col items-center text-center">
         <div id="myaccount" class="mb-2"></div>
-        <a href="myaccount.html" class="text-indigo-600 font-semibold"><i class="fa fa-address-book"></i> <span data-i18n="menu.my_account">My Account</span></a>
-        <a href="cart.html" class="text-indigo-600 font-semibold"><i class="fa-solid fa-basket-shopping"></i> <span data-i18n="menu.cart">Cart</span></a>
-        <a href="orders.html" class="text-indigo-600 font-semibold"><i class="fa-solid fa-truck"></i> <span data-i18n="menu.orders">Orders</span></a>
+        <a href="myaccount.html" class="text-blue-600 font-semibold"><i class="fa fa-address-book"></i> <span data-i18n="menu.my_account">My Account</span></a>
+        <a href="cart.html" class="text-blue-600 font-semibold"><i class="fa-solid fa-basket-shopping"></i> <span data-i18n="menu.cart">Cart</span></a>
+        <a href="orders.html" class="text-blue-600 font-semibold"><i class="fa-solid fa-truck"></i> <span data-i18n="menu.orders">Orders</span></a>
         <div id="logout" class="mt-2"></div>
       </div>
     </nav>
 
     <!-- Menu Mobile -->
     <nav id="Menu1-mobile" class="hidden flex-col items-center text-center space-y-4 text-gray-700 text-base font-medium bg-white absolute w-full left-0 top-[71px] z-[1000] py-4 shadow-lg md:hidden">
-      <a href="home.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-home"></i><span data-i18n="menu.home">Home</span></a>
-      <a href="news.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-newspaper"></i><span data-i18n="menu.news">News</span></a>
-      <a href="store.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="menu.store">Store</span></a>
-      <a href="Language.html" class="flex items-center gap-2 hover:text-indigo-600"><i class="fa fa-globe"></i><span data-i18n="menu.language">Language</span></a>
+      <a href="home.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-home"></i><span data-i18n="menu.home">Home</span></a>
+      <a href="news.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-newspaper"></i><span data-i18n="menu.news">News</span></a>
+      <a href="store.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="menu.store">Store</span></a>
+      <a href="Language.html" class="flex items-center gap-2 hover:text-blue-600"><i class="fa fa-globe"></i><span data-i18n="menu.language">Language</span></a>
     </nav>
   </header>
 
