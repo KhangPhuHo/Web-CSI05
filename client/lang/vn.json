@@ -43,6 +43,39 @@
     "sign_in": "Đăng nhập",
     "no_account": "Chưa có tài khoản"
   },
+  "home": {
+    "aboutBadge": "GIỚI THIỆU BOOKSTORE",
+    "aboutTitle": "Điểm Đến Sách Trực Tuyến Của Bạn",
+    "aboutDescription1": "BookStore là nền tảng bán sách trực tuyến hiện đại, nơi bạn có thể khám phá, tìm hiểu và mua những cuốn sách thuộc nhiều thể loại khác nhau. Từ các tác phẩm kinh điển vượt thời gian đến những cuốn sách bán chạy mới nhất, chúng tôi mang việc đọc sách đến gần hơn với mọi người.",
+    "aboutDescription2": "Sứ mệnh của chúng tôi là giúp việc đọc sách trở nên dễ tiếp cận, thú vị và thuận tiện thông qua trải nghiệm mua sắm trực tuyến hiện đại và liền mạch.",
+
+    "readingTitle": "Đọc Sách Truyền Cảm Hứng Cho Mọi Người",
+    "readingDescription": "Sách mở ra cánh cửa đến những thế giới, ý tưởng và cơ hội mới. Dù bạn muốn học hỏi, thư giãn hay khám phá trí tưởng tượng, mỗi trang sách đều mang đến những giá trị ý nghĩa.",
+    "startReading": "Bắt Đầu Đọc Ngay",
+    "latestNews": "Tin Tức Mới Nhất",
+
+    "whyBadge": "TẠI SAO NÊN CHỌN BOOKSTORE",
+    "whyTitle": "Mọi Điều Bạn Cần Cho Trải Nghiệm Đọc Sách Tuyệt Vời",
+    "whyDescription": "Chúng tôi mang đến hàng nghìn đầu sách thuộc nhiều thể loại khác nhau, giúp bạn dễ dàng tìm thấy cuốn sách yêu thích tiếp theo của mình.",
+
+    "collectionTitle": "Kho Sách Đa Dạng",
+    "collectionDescription": "Khám phá tiểu thuyết, sách giáo dục, kinh doanh, công nghệ, sách thiếu nhi và nhiều thể loại hấp dẫn khác.",
+
+    "deliveryTitle": "Giao Hàng Nhanh Chóng",
+    "deliveryDescription": "Dịch vụ giao hàng nhanh chóng và đáng tin cậy, giúp sách đến tay bạn an toàn và đúng hẹn.",
+
+    "reviewTitle": "Đánh Giá Đáng Tin Cậy",
+    "reviewDescription": "Tham khảo những đánh giá chân thực từ cộng đồng độc giả trước khi đưa ra quyết định mua sách.",
+
+    "secureTitle": "Mua Sắm An Toàn",
+    "secureDescription": "Thanh toán bảo mật cùng đội ngũ hỗ trợ khách hàng tận tâm cho mọi đơn hàng.",
+
+    "newsBadge": "📰 Tin Tức Mới Nhất",
+    "loadingNewsTitle": "Đang tải tin tức mới nhất...",
+    "loadingNewsContent": "Vui lòng chờ trong giây lát...",
+
+    "readMore": "Đọc Thêm"
+  },
   "modal": {
     "confirm_title": "Xác nhận xoá tài khoản",
     "confirm_text": "Bạn có muốn xoá tài khoản không, hành động này không thể hoàn tác!",

@@ -43,6 +43,39 @@
     "sign_in": "Signin/Login",
     "no_account": "No account"
   },
+  "home": {
+    "aboutBadge": "ABOUT BOOKSTORE",
+    "aboutTitle": "Your Digital Book Destination",
+    "aboutDescription1": "BookStore is a modern online platform where readers can discover, explore, and purchase books across all genres. From timeless classics to the latest bestsellers, we bring reading closer to everyone.",
+    "aboutDescription2": "Our mission is to make reading accessible, enjoyable, and convenient through a seamless shopping experience powered by modern technology.",
+
+    "readingTitle": "Reading Inspires Everyone",
+    "readingDescription": "Books open doors to new worlds, ideas, and possibilities. Whether you're learning, escaping reality, or exploring imagination — every page brings something meaningful.",
+    "startReading": "Start Reading Now",
+    "latestNews": "Latest News",
+
+    "whyBadge": "WHY CHOOSE BOOKSTORE",
+    "whyTitle": "Everything You Need For A Better Reading Experience",
+    "whyDescription": "We bring together thousands of books from different genres, making it easy to discover your next favorite read.",
+
+    "collectionTitle": "Wide Collection",
+    "collectionDescription": "Browse novels, education, business, technology, children's books and much more.",
+
+    "deliveryTitle": "Fast Delivery",
+    "deliveryDescription": "Quick and reliable shipping so your books arrive safely and on time.",
+
+    "reviewTitle": "Trusted Reviews",
+    "reviewDescription": "Read authentic reviews from our community before making your purchase.",
+
+    "secureTitle": "Secure Shopping",
+    "secureDescription": "Safe checkout and reliable customer support for every order.",
+
+    "newsBadge": "📰 Latest News",
+    "loadingNewsTitle": "Loading latest news...",
+    "loadingNewsContent": "Please wait...",
+
+    "readMore": "Read More"
+  },
   "modal": {
     "confirm_title": "Confirm Account Deletion",
     "confirm_text": "Are you sure you want to delete your account? This action is irreversible.",

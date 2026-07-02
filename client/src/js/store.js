@@ -72,7 +72,7 @@ function displayProducts(productArray, topRatedId = null) {
 }
 
 function renderProductCard(product, topRatedId = null) {
-  const imageSrc = product.picture?.trim() || "./src/img/shapespeakicon.jpg";
+  const imageSrc = product.picture?.trim() || "./src/img/UnknownBook.webp";
   const isTopRated = topRatedId && product.id === topRatedId;
 
   const card = document.createElement("div");
@@ -185,7 +185,7 @@ async function loadProductIntro(productId) {
 }
 
 async function showPopup(product) {
-  const imageSrc = product.picture?.trim() || "./src/img/shapespeakicon.jpg";
+  const imageSrc = product.picture?.trim() || "./src/img/UnknownBook.webp";
   const postId = product.id || product.postId;
 
   if (product.stock <= 0) {

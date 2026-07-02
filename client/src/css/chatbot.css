@@ -38,7 +38,7 @@
 }
 
 #chat-header {
-  background: #4f46e5;
+  background: #355de3;
   color: white;
   padding: 10px;
   font-weight: bold;
@@ -101,7 +101,7 @@
 
 #chat-input button {
   padding: 8px 15px;
-  background: #4f46e5;
+  background: #2a24e7;
   color: white;
   border: none;
   border-radius: 6px;

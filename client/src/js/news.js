@@ -61,7 +61,7 @@ function displayProducts(productArray) {
       hover:shadow-2xl transition-all duration-300 p-3 transform hover:scale-105 hover:-rotate-1
     `;
 
-    const imageSrc = product.picture?.trim() || "./src/img/shapespeakicon.jpg";
+    const imageSrc = product.picture?.trim() || "./src/img/UnknownNews.webp";
     const createdAt = formatDate(product.createdAt);
     const updatedAt = formatDate(product.updatedAt);
 
@@ -168,12 +168,12 @@ async function loadProductIntro(productId) {
   } catch (err) {
     console.error("❌ Lỗi khi tải giới thiệu sản phẩm:", err);
     container.setAttribute("data-i18n", "store.error_intro");
-      setLanguage(localStorage.getItem("lang") || "en");
+    setLanguage(localStorage.getItem("lang") || "en");
   }
 }
 
 async function showPopup(product) {
-  const imageSrc = product.picture?.trim() || "./src/img/shapespeakicon.jpg";
+  const imageSrc = product.picture?.trim() || "./src/img/UnknownNews.webp";
   const postId = product.id || product.postId;
 
   // Tạo thẻ chứa flip-card bên trong popup
@@ -314,7 +314,35 @@ window.suggest = function () {
   });
 };
 
-window.addEventListener("DOMContentLoaded", () => {
-  fetchProducts();
+async function OpenPopupFromURL() {
+  // Tự mở popup nếu có query param "id" được gửi từ home.html
+  const params = new URLSearchParams(window.location.search);
+  const newsId = params.get("id");
+
+  if (!newsId) return;
+
+  try {
+
+    const snap = await getDoc(doc(db, "news", newsId));
+
+    if (!snap.exists()) return;
+
+    const product = {
+      id: snap.id,
+      ...snap.data()
+    };
+
+    showPopup(product);
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  await fetchProducts();
+  await OpenPopupFromURL()
 });
 
