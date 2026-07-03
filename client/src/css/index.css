@@ -340,7 +340,15 @@ input:focus {
   color: #333;
 }
 
+.modal-content textarea {
+  color: #333;
+}
+
 .modal-content input::placeholder {
+  color: #888;
+}
+
+.modal-content textarea::placeholder {
   color: #888;
 }
 
