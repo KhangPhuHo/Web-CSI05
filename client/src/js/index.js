@@ -37,7 +37,7 @@ async function loadProducts(container) {
   <tr>
     <td><img src="${coffee.picture || '../img/shapespeakicon.jpg'}" style="width: 100px;"></td>
     <td>${coffee.name}</td>
-    <td>${coffee.details}</td>
+    <td class="product-details">${coffee.details}</td>
     <td>${coffee.price} VND</td>
     <td>${coffee.stock}</td>
     <td>

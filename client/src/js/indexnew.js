@@ -51,7 +51,7 @@ async function loadProducts(container) {
         <tr>
           <td><img src="${news.picture || '../img/shapespeakicon.jpg'}" style="width: 100px;"></td>
           <td>${news.name}</td>
-          <td>${news.details}</td>
+          <td class="product-details">${news.details}</td>
           <td>${news.author}</td>
           <td>
           <button onclick="location.href='edit-product-intro.html?productId=${newsId}'"
