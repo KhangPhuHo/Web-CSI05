@@ -96,7 +96,7 @@ function renderProfile(avatar, name, email, phone, address) {
 
   profile.innerHTML = `
     <div class="w-40 h-40 mx-auto">
-      <img src="${avatar || './src/img/account-25.png'}"
+      <img src="${avatar || './src/img/NoAccount.webp'}"
            class="w-full h-full aspect-square rounded-full object-cover"
            alt="Avatar">
     </div>

@@ -13,7 +13,7 @@ function renderMenu() {
         <i class="fa fa-bars"></i>
       </button>
       <a href="home.html" class="flex items-center text-blue-400 font-extrabold space-x-2">
-        <img src="./src/img/logo.jpg" class="w-10 h-10 aspect-square rounded-full object-cover" alt="shapespeak">
+        <img src="./src/img/logo.webp" class="w-10 h-10 aspect-square rounded-full object-cover" alt="shapespeak">
         <span class="text-lg md:text-xl">BookStore</span>
       </a>
 
