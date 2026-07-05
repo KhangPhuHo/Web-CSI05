@@ -75,6 +75,14 @@ window.deleteProduct = async (productId) => {
   if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
     try {
       await deleteDoc(doc(db, "products", productId));
+
+      await fetch(
+        `${API_BASE_URL}/api/sync-product/${productId}`,
+        {
+          method: "DELETE"
+        }
+      );
+
       showToast("✅ Đã xóa sản phẩm!", "success");
       loadProducts(document.getElementById("content"));
     } catch (error) {
@@ -139,6 +147,14 @@ window.updateProduct = async (event) => {
 
   try {
     await updateDoc(doc(db, "products", productID), productDataUpdate);
+
+    await fetch(
+      `${API_BASE_URL}/api/sync-product/${productID}`,
+      {
+        method: "POST"
+      }
+    );
+
     showToast("✅ Cập nhật thành công!", "success");
     closeModal2();
     loadProducts(document.getElementById("content"));
@@ -152,6 +168,15 @@ window.updateProduct = async (event) => {
 async function AddProduct(newProduct) {
   try {
     await addDoc(collection(db, "products"), newProduct);
+
+    // Sync sang products.json
+    await fetch(
+      `${API_BASE_URL}/api/sync-product/${docRef.id}`,
+      {
+        method: "POST"
+      }
+    );
+
     showToast("✅ Thêm sản phẩm thành công!", "success");
     loadProducts(document.getElementById("content"));
   } catch (error) {

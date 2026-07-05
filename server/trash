@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const fs = require("fs");
-const path = require("path");
 const cors = require("cors");
 const upload = require("./middleware/multer"); // Đã cấu hình giới hạn 150MB và lọc MIME
 const cloudinary = require("./utils/cloudinary");
@@ -10,11 +9,6 @@ const admin = require("firebase-admin");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SUPER_ADMIN_UID = "7ZXC61fOA4beVOjcxwDZFqeYu9y1";
-
-const PRODUCTS_JSON_PATH = path.join(
-  __dirname,
-  "../agent/data/text/products.json"
-);
 
 // ✅ Khởi tạo Firebase Admin SDK
 admin.initializeApp({
@@ -121,11 +115,6 @@ app.post("/deleteUser", async (req, res) => {
     return res.status(500).json({ error: "❌ Lỗi khi xoá tài khoản: " + error.message });
   }
 });
-
-const syncRoutes = require("./routes/syncRoutes");
-const db = admin.firestore();
-
-app.use("/api", syncRoutes(db));
 
 // ✅ Khởi động server
 app.listen(PORT, () => {
