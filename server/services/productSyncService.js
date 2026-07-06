@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-const cleanSummary = require("../utils/repairJsonFile");
+
+const repairJsonFile =
+  require("../utils/repairJsonFile");
 
 const PRODUCTS_JSON_PATH = path.join(
   __dirname,
@@ -32,33 +34,10 @@ async function syncProductToJson(db, productId) {
   const oldProduct =
     jsonData[productId] || {};
 
-  const oldSummary =
-    oldProduct.summary || "";
-
-  const newSummary =
-    firestoreData.summary || "";
-
-  const summaryChanged =
-    oldSummary !== newSummary;
-
-  let mergedProduct = {
+  jsonData[productId] = {
     ...oldProduct,
     ...firestoreData
   };
-
-  if (
-    !oldProduct.isFixed ||
-    summaryChanged
-  ) {
-
-    mergedProduct.summary =
-      cleanSummary(newSummary);
-
-    mergedProduct.isFixed = true;
-  }
-
-  jsonData[productId] =
-    mergedProduct;
 
   fs.writeFileSync(
     PRODUCTS_JSON_PATH,
@@ -66,9 +45,7 @@ async function syncProductToJson(db, productId) {
     "utf8"
   );
 
-  await repairJsonFile(
-    PRODUCTS_JSON_PATH
-  );
+  await repairJsonFile(PRODUCTS_JSON_PATH);
 
   console.log("✅ Synced:", productId);
 }
