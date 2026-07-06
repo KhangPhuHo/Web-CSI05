@@ -39,6 +39,10 @@ async function syncProductToJson(db, productId) {
     ...firestoreData
   };
 
+  console.log("Saving to:", PRODUCTS_JSON_PATH);
+  console.log("Total products:", Object.keys(jsonData).length);
+  console.log("Updated product:", jsonData[productId]);
+
   fs.writeFileSync(
     PRODUCTS_JSON_PATH,
     JSON.stringify(jsonData, null, 2),
