@@ -62,6 +62,39 @@
                         <input type="text" id="name" name="name" required />
                     </div>
                     <div class="form-group">
+                        <label for="author">Tác giả</label>
+                        <input type="text" id="author" name="author" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="publishedYear">Năm xuất bản</label>
+                        <input type="number" id="publishedYear" name="publishedYear" required />
+                    </div>
+                    <div class="form-group">
+
+                        <label>Genres</label>
+
+                        <div id="selected-genres" class="border rounded p-2 min-h-[50px]">
+                        </div>
+
+                        <input id="genre-input" type="text" placeholder="Type genre..."
+                            class="w-full border rounded mt-2 p-2">
+
+                        <div id="genre-dropdown" class="border rounded shadow bg-white hidden max-h-48 overflow-y-auto">
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+
+                        <label>Tags</label>
+
+                        <div id="selected-tags" class="border rounded p-2 min-h-[50px]">
+                        </div>
+
+                        <input id="tag-input" type="text" placeholder="Type tag then press Enter..."
+                            class="w-full border rounded mt-2 p-2">
+
+                    </div>
+                    <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>
                         <textarea id="details" name="details" rows="8" required></textarea>
                     </div>
@@ -102,6 +135,14 @@
                     <div class="form-group">
                         <label for="name">Tên sản phẩm</label>
                         <input type="text" id="edit-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Tác giả</label>
+                        <input type="text" id="edit-author" name="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="publishedYear">Năm xuất bản</label>
+                        <input type="number" id="edit-publishedYear" name="publishedYear" required>
                     </div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>

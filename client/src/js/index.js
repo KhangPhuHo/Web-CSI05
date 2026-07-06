@@ -1,6 +1,17 @@
 // ✅ index.js (Firebase v10 Modular)
 import { db } from "./firebase-config.js";
 import { showToast } from "./toast.js";
+import {
+  initGenreSelector,
+  getSelectedGenres,
+  setSelectedGenres
+} from "./components/genreSelector.js";
+
+import {
+  initTagSelector,
+  getSelectedTags,
+  setSelectedTags
+} from "./components/tagSelector.js";
 
 import {
   collection,
@@ -16,6 +27,18 @@ const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("content");
+
+  await initGenreSelector({
+    inputId: "genre-input",
+    selectedId: "selected-genres",
+    dropdownId: "genre-dropdown"
+  });
+
+  initTagSelector(
+    "tag-input",
+    "selected-tags"
+  );
+
   loadProducts(container);
 });
 
@@ -102,6 +125,14 @@ window.getOneProduct = async (productId) => {
         document.getElementById("preview-picture-edit").src = productItem.picture || '../img/logo.webp';
       }
       document.getElementById("edit-name").value = productItem.name;
+      document.getElementById("edit-author").value = productItem.author;
+      document.getElementById("edit-publishedYear").value = productItem.publishedYear;
+      setSelectedGenres(
+        productItem.genres || []
+      );
+      setSelectedTags(
+        productItem.tags || []
+      );
       document.getElementById("edit-details").value = productItem.details;
       document.getElementById("edit-summary").value = productItem.summary;
       document.getElementById("edit-price").value = productItem.price;
@@ -124,6 +155,10 @@ window.updateProduct = async (event) => {
   let picture = document.getElementById("edit-picture").files[0];
   let productDataUpdate = {
     name: document.getElementById("edit-name").value,
+    author: document.getElementById("edit-author").value,
+    publishedYear: Number(document.getElementById("edit-publishedYear").value),
+    genres: getSelectedGenres(),
+    tags: getSelectedTags(),
     details: document.getElementById("edit-details").value,
     summary: document.getElementById("edit-summary").value,
     price: Number(document.getElementById("edit-price").value),
@@ -199,6 +234,10 @@ async function handleAddProduct() {
   let picture = document.getElementById("picture").files[0];
   let newProduct = {
     name: document.getElementById("name").value,
+    author: document.getElementById("author").value,
+    publishedYear: Number(document.getElementById("publishedYear").value),
+    genres: getSelectedGenres(),
+    tags: getSelectedTags(),
     details: document.getElementById("details").value,
     summary: document.getElementById("summary").value,
     price: Number(document.getElementById("price").value),
