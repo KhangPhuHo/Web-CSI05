@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const repairJsonFile =
-  require("../utils/repairJsonFile");
+const repairProductsJson =
+  require("../utils/repairProductsJson");
 
 const PRODUCTS_JSON_PATH = path.join(
   __dirname,
@@ -34,10 +34,32 @@ async function syncProductToJson(db, productId) {
   const oldProduct =
     jsonData[productId] || {};
 
+  const summaryChanged =
+    oldProduct.summary !==
+    (firestoreData.summary || "");
+
   jsonData[productId] = {
     ...oldProduct,
     ...firestoreData
   };
+
+  // Nếu sản phẩm mới
+  if (!oldProduct.isFixed) {
+
+    jsonData[productId].isFixed = false;
+  }
+
+  // Nếu summary bị sửa
+  if (summaryChanged) {
+
+    jsonData[productId].isFixed = false;
+  }
+
+  if (!jsonData[productId].summary) {
+    jsonData[productId].summary = "";
+  }
+
+  jsonData[productId].isFixed = false;
 
   console.log("Saving to:", PRODUCTS_JSON_PATH);
   console.log("Total products:", Object.keys(jsonData).length);
@@ -49,7 +71,9 @@ async function syncProductToJson(db, productId) {
     "utf8"
   );
 
-  await repairJsonFile(PRODUCTS_JSON_PATH);
+  await repairProductsJson(
+    PRODUCTS_JSON_PATH
+  );
 
   console.log("✅ Synced:", productId);
 }

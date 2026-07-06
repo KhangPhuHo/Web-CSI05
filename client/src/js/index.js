@@ -38,7 +38,6 @@ async function loadProducts(container) {
     <td><img src="${coffee.picture || '../img/logo.webp'}" style="width: 100px;"></td>
     <td>${coffee.name}</td>
     <td class="product-details">${coffee.details}</td>
-    <td class="product-details">${coffee.summary}</td>
     <td>${coffee.price} VND</td>
     <td>${coffee.stock}</td>
     <td>
