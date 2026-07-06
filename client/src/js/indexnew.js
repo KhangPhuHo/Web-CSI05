@@ -49,7 +49,7 @@ async function loadProducts(container) {
 
       htmls += `
         <tr>
-          <td><img src="${news.picture || '../img/shapespeakicon.jpg'}" style="width: 100px;"></td>
+          <td><img src="${news.picture || '../img/logo.webp'}" style="width: 100px;"></td>
           <td>${news.name}</td>
           <td class="product-details">${news.details}</td>
           <td>${news.author}</td>
@@ -95,7 +95,7 @@ window.getOneProduct = async (newsId) => {
     const docSnap = await getDoc(doc(db, "news", newsId));
     if (docSnap.exists()) {
       const data = docSnap.data();
-      document.getElementById("preview-picture-edit").src = data.picture || "../img/shapespeakicon.jpg";
+      document.getElementById("preview-picture-edit").src = data.picture || "../img/logo.webp";
       document.getElementById("edit-name").value = data.name || "";
       document.getElementById("edit-details").value = data.details || "";
       document.getElementById("edit-author").value = data.author || "";

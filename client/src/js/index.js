@@ -35,7 +35,7 @@ async function loadProducts(container) {
 
       htmls += `
   <tr>
-    <td><img src="${coffee.picture || '../img/shapespeakicon.jpg'}" style="width: 100px;"></td>
+    <td><img src="${coffee.picture || '../img/logo.webp'}" style="width: 100px;"></td>
     <td>${coffee.name}</td>
     <td class="product-details">${coffee.details}</td>
     <td>${coffee.price} VND</td>
@@ -99,7 +99,7 @@ window.getOneProduct = async (productId) => {
     if (docSnap.exists()) {
       const productItem = docSnap.data();
       if (productItem.picture) {
-        document.getElementById("preview-picture-edit").src = productItem.picture || '../img/shapespeakicon.jpg';
+        document.getElementById("preview-picture-edit").src = productItem.picture || '../img/logo.webp';
       }
       document.getElementById("edit-name").value = productItem.name;
       document.getElementById("edit-details").value = productItem.details;
@@ -167,9 +167,12 @@ window.updateProduct = async (event) => {
 // ✅ Thêm sản phẩm mới
 async function AddProduct(newProduct) {
   try {
-    await addDoc(collection(db, "products"), newProduct);
 
-    // Sync sang products.json
+    const docRef = await addDoc(
+      collection(db, "products"),
+      newProduct
+    );
+
     await fetch(
       `${API_BASE_URL}/api/sync-product/${docRef.id}`,
       {
@@ -178,10 +181,14 @@ async function AddProduct(newProduct) {
     );
 
     showToast("✅ Thêm sản phẩm thành công!", "success");
+
     loadProducts(document.getElementById("content"));
+
   } catch (error) {
+
     showToast("❌ Lỗi khi thêm sản phẩm!", "error");
     console.error("Error adding product:", error);
+
   }
 }
 
