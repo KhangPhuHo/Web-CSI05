@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý dữ liệu AI</title>
+
+    <link rel="website icon" type="image/png" href="./src/img/logo.webp">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="./src/css/styles.css">
+    <link rel="stylesheet" href="./src/css/menure.css">
+    <link rel="stylesheet" href="./src/css/toast.css">
+    <link rel="stylesheet" href="./src/css/index.css">
+    <link rel="stylesheet" href="./src/css/chatbot.css">
+
+    <style>
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 500px;
+            overflow-y: auto;
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .status-fixed {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-notfixed {
+            color: red;
+            font-weight: bold;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="Menu"></div>
+
+    <br><br><br>
+
+    <div id="bot"></div>
+
+    <div id="wrapper">
+
+        <h1 class="text-3xl font-bold text-center text-indigo-600">
+            Quản lý dữ liệu AI
+        </h1>
+
+        <div class="flex flex-wrap gap-3 my-5">
+
+            <button id="reload-btn"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+
+                🔄 Reload
+
+            </button>
+
+            <button id="download-btn"
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+
+                ⬇ Download JSON
+
+            </button>
+
+        </div>
+
+        <input
+            id="search-input"
+            type="text"
+            placeholder="Tìm theo ID, tên sản phẩm hoặc summary...">
+
+        <div id="tableinfo" style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+
+                        <th>Tên sản phẩm</th>
+
+                        <th>isFixed</th>
+
+                        <th>Summary</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="content">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- Modal xem JSON -->
+
+    <div
+        id="jsonModal"
+        class="modal">
+
+        <div class="modal-content">
+
+            <button
+                onclick="closeJsonModal()"
+                class="absolute top-3 right-3 w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full">
+
+                ✕
+
+            </button>
+
+            <h2 class="text-2xl font-bold mb-5">
+
+                Chi tiết dữ liệu AI
+
+            </h2>
+
+            <div class="mb-3">
+
+                <label>ID</label>
+
+                <input
+                    id="modal-id"
+                    class="w-full border rounded p-2"
+                    readonly>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Tên</label>
+
+                <input
+                    id="modal-name"
+                    class="w-full border rounded p-2"
+                    readonly>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>isFixed</label>
+
+                <input
+                    id="modal-fixed"
+                    class="w-full border rounded p-2"
+                    readonly>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Summary</label>
+
+                <textarea
+                    id="modal-summary"
+                    rows="10"
+                    class="w-full border rounded p-2"
+                    readonly></textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>JSON</label>
+
+                <pre id="modal-json"></pre>
+
+            </div>
+
+            <div class="flex gap-3 mt-5">
+
+                <button
+                    id="copy-json-btn"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+
+                    📋 Copy JSON
+
+                </button>
+
+                <button
+                    id="delete-json-btn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+
+                    🗑 Xóa khỏi AI
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Toast -->
+
+    <div id="toast-container"
+        class="fixed top-20 right-4 z-[1100] space-y-2 max-w-xs w-full md:w-auto mx-auto md:mx-0">
+
+    </div>
+
+    <!-- Scripts -->
+
+    <script type="module" src="./src/js/language.js"></script>
+
+    <script type="module" src="./src/js/toast.js"></script>
+
+    <script type="module" src="./src/js/check-admin.js"></script>
+
+    <script type="module" src="./src/js/firebase-config.js"></script>
+
+    <script src="./src/js/menu.js"></script>
+
+    <script type="module" src="./src/js/profile.js"></script>
+
+    <script type="module" src="./src/js/logout.js"></script>
+
+    <script type="module" src="./src/js/ai-training-manager.js"></script>
+
+    <script type="module" src="./src/js/chatbot.js"></script>
+
+    <script>
+
+        function closeJsonModal() {
+
+            document.getElementById("jsonModal").style.display = "none";
+
+        }
+
+        function openJsonModal() {
+
+            document.getElementById("jsonModal").style.display = "block";
+
+        }
+
+    </script>
+
+</body>
+
+</html>

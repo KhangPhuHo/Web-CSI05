@@ -11,10 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SUPER_ADMIN_UID = "7ZXC61fOA4beVOjcxwDZFqeYu9y1";
 
-const PRODUCTS_JSON_PATH = path.join(
-  __dirname,
-  "../agent/data/text/products.json"
-);
 
 // ✅ Khởi tạo Firebase Admin SDK
 admin.initializeApp({
@@ -126,6 +122,20 @@ const syncRoutes = require("./routes/syncRoutes");
 const db = admin.firestore();
 
 app.use("/api", syncRoutes(db));
+
+const PRODUCTS_JSON_PATH = path.join(
+  __dirname,
+  "../agent/data/text/products.json"
+);
+
+app.get("/api/download-products", (req, res) => {
+  res.download(PRODUCTS_JSON_PATH);
+});
+
+const productsJsonRoutes =
+require("./routes/productsJsonRoutes");
+
+app.use("/api", productsJsonRoutes);
 
 // ✅ Khởi động server
 app.listen(PORT, () => {
