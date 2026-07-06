@@ -38,6 +38,7 @@ async function loadProducts(container) {
     <td><img src="${coffee.picture || '../img/logo.webp'}" style="width: 100px;"></td>
     <td>${coffee.name}</td>
     <td class="product-details">${coffee.details}</td>
+    <td class="product-details">${coffee.summary}</td>
     <td>${coffee.price} VND</td>
     <td>${coffee.stock}</td>
     <td>
@@ -103,6 +104,7 @@ window.getOneProduct = async (productId) => {
       }
       document.getElementById("edit-name").value = productItem.name;
       document.getElementById("edit-details").value = productItem.details;
+      document.getElementById("edit-summary").value = productItem.summary;
       document.getElementById("edit-price").value = productItem.price;
       document.getElementById("edit-stock").value = productItem.stock;
       document.getElementById("form-edit-product").dataset.productId = productId;
@@ -124,6 +126,7 @@ window.updateProduct = async (event) => {
   let productDataUpdate = {
     name: document.getElementById("edit-name").value,
     details: document.getElementById("edit-details").value,
+    summary: document.getElementById("edit-summary").value,
     price: Number(document.getElementById("edit-price").value),
     stock: Number(document.getElementById("edit-stock").value),
   };
@@ -198,6 +201,7 @@ async function handleAddProduct() {
   let newProduct = {
     name: document.getElementById("name").value,
     details: document.getElementById("details").value,
+    summary: document.getElementById("summary").value,
     price: Number(document.getElementById("price").value),
     stock: Number(document.getElementById("stock").value),
   };
