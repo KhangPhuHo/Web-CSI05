@@ -69,7 +69,7 @@
                         <label for="publishedYear">Năm xuất bản</label>
                         <input type="number" id="publishedYear" name="publishedYear" required />
                     </div>
-                    <div class="form-group">
+                    <div class="form-group relative">
                         <label>Genres</label>
 
                         <div id="selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
@@ -78,16 +78,20 @@
                             placeholder="Nhập hoặc tìm thể loại..." />
 
                         <div id="genre-dropdown"
-                            class="border rounded mt-1 bg-white shadow hidden max-h-52 overflow-y-auto">
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group relative">
                         <label>Tags</label>
 
                         <div id="selected-tags" class="flex flex-wrap gap-2 mb-2"></div>
 
                         <input id="tag-input" type="text" class="w-full border rounded p-2"
                             placeholder="Nhấn Enter để thêm tag" />
+
+                        <div id="tag-dropdown"
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>
@@ -139,7 +143,7 @@
                         <label for="publishedYear">Năm xuất bản</label>
                         <input type="number" id="edit-publishedYear" name="publishedYear" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group relative">
                         <label>Genres</label>
 
                         <div id="edit-selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
@@ -148,16 +152,20 @@
                             placeholder="Nhập hoặc tìm thể loại..." />
 
                         <div id="edit-genre-dropdown"
-                            class="border rounded mt-1 bg-white shadow hidden max-h-52 overflow-y-auto">
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group relative">
                         <label>Tags</label>
 
                         <div id="edit-selected-tags" class="flex flex-wrap gap-2 mb-2"></div>
 
                         <input id="edit-tag-input" type="text" class="w-full border rounded p-2"
                             placeholder="Nhấn Enter để thêm tag" />
+
+                        <div id="edit-tag-dropdown"
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>

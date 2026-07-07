@@ -2,12 +2,8 @@
 import { db } from "./firebase-config.js";
 import { showToast } from "./toast.js";
 import {
-  initGenreSelector
-} from "./components/genreSelector.js";
-
-import {
-  initTagSelector
-} from "./components/tagSelector.js";
+  createSelector
+} from "./components/GenreandTagSelector.js";
 
 import {
   collection,
@@ -21,48 +17,68 @@ import {
 
 const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
 
-let addGenreSelector;
-let editGenreSelector;
-
-let addTagSelector;
-let editTagSelector;
+const selectors = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("content");
 
-  addGenreSelector =
-    await initGenreSelector({
+  selectors.addGenre =
+    await createSelector({
+
+      collectionName: "genres",
 
       inputId: "genre-input",
+
       selectedId: "selected-genres",
-      dropdownId: "genre-dropdown"
+
+      dropdownId: "genre-dropdown",
+
+      createLabel: "Create Genre"
 
     });
 
-  editGenreSelector =
-    await initGenreSelector({
+  selectors.editGenre =
+    await createSelector({
+
+      collectionName: "genres",
 
       inputId: "edit-genre-input",
+
       selectedId: "edit-selected-genres",
-      dropdownId: "edit-genre-dropdown"
+
+      dropdownId: "edit-genre-dropdown",
+
+      createLabel: "Create Genre"
 
     });
 
-  addTagSelector =
-    await initTagSelector({
+  selectors.addTag =
+    await createSelector({
+
+      collectionName: "tags",
 
       inputId: "tag-input",
+
       selectedId: "selected-tags",
-      dropdownId: "tag-dropdown"
+
+      dropdownId: "tag-dropdown",
+
+      createLabel: "Create Tag"
 
     });
 
-  editTagSelector =
-    await initTagSelector({
+  selectors.editTag =
+    await createSelector({
+
+      collectionName: "tags",
 
       inputId: "edit-tag-input",
+
       selectedId: "edit-selected-tags",
-      dropdownId: "edit-tag-dropdown"
+
+      dropdownId: "edit-tag-dropdown",
+
+      createLabel: "Create Tag"
 
     });
 
@@ -154,10 +170,11 @@ window.getOneProduct = async (productId) => {
       document.getElementById("edit-name").value = productItem.name;
       document.getElementById("edit-author").value = productItem.author;
       document.getElementById("edit-publishedYear").value = productItem.publishedYear;
-      editGenreSelector.setSelected(
+      selectors.editGenre.setSelected(
         productItem.genres || []
       );
-      editTagSelector.setSelected(
+
+      selectors.editTag.setSelected(
         productItem.tags || []
       );
       document.getElementById("edit-details").value = productItem.details;
@@ -184,8 +201,8 @@ window.updateProduct = async (event) => {
     name: document.getElementById("edit-name").value,
     author: document.getElementById("edit-author").value,
     publishedYear: Number(document.getElementById("edit-publishedYear").value),
-    genres: editGenreSelector.getSelected(),
-    tags: editTagSelector.getSelected(),
+    genres: selectors.editGenre.getSelected(),
+    tags: selectors.editTag.getSelected(),
     details: document.getElementById("edit-details").value,
     summary: document.getElementById("edit-summary").value,
     price: Number(document.getElementById("edit-price").value),
@@ -221,8 +238,8 @@ window.updateProduct = async (event) => {
 
     showToast("✅ Cập nhật thành công!", "success");
 
-    editGenreSelector.clear();
-    editTagSelector.clear();
+    selectors.editGenre.clear();
+    selectors.editTag.clear();
 
     closeModal2();
     loadProducts(document.getElementById("content"));
@@ -252,8 +269,8 @@ async function AddProduct(newProduct) {
 
     // Reset form
     document.getElementById("form-new-product").reset();
-    addGenreSelector.clear();
-    addTagSelector.clear();
+    selectors.addGenre.clear();
+    selectors.addTag.clear();
 
     loadProducts(document.getElementById("content"));
 
@@ -272,8 +289,8 @@ async function handleAddProduct() {
     name: document.getElementById("name").value,
     author: document.getElementById("author").value,
     publishedYear: Number(document.getElementById("publishedYear").value),
-    genres: addGenreSelector.getSelected(),
-    tags: addTagSelector.getSelected(),
+    genres: selectors.addGenre.getSelected(),
+    tags: selectors.addTag.getSelected(),
     details: document.getElementById("details").value,
     summary: document.getElementById("summary").value,
     price: Number(document.getElementById("price").value),
