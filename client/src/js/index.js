@@ -2,15 +2,11 @@
 import { db } from "./firebase-config.js";
 import { showToast } from "./toast.js";
 import {
-  initGenreSelector,
-  getSelectedGenres,
-  setSelectedGenres
+  initGenreSelector
 } from "./components/genreSelector.js";
 
 import {
-  initTagSelector,
-  getSelectedTags,
-  setSelectedTags
+  initTagSelector
 } from "./components/tagSelector.js";
 
 import {
@@ -25,19 +21,50 @@ import {
 
 const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
 
-document.addEventListener("DOMContentLoaded", () => {
+let addGenreSelector;
+let editGenreSelector;
+
+let addTagSelector;
+let editTagSelector;
+
+document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("content");
 
-  await initGenreSelector({
-    inputId: "genre-input",
-    selectedId: "selected-genres",
-    dropdownId: "genre-dropdown"
-  });
+  addGenreSelector =
+    await initGenreSelector({
 
-  initTagSelector(
-    "tag-input",
-    "selected-tags"
-  );
+      inputId: "genre-input",
+      selectedId: "selected-genres",
+      dropdownId: "genre-dropdown"
+
+    });
+
+  editGenreSelector =
+    await initGenreSelector({
+
+      inputId: "edit-genre-input",
+      selectedId: "edit-selected-genres",
+      dropdownId: "edit-genre-dropdown"
+
+    });
+
+  addTagSelector =
+    await initTagSelector({
+
+      inputId: "tag-input",
+      selectedId: "selected-tags",
+      dropdownId: "tag-dropdown"
+
+    });
+
+  editTagSelector =
+    await initTagSelector({
+
+      inputId: "edit-tag-input",
+      selectedId: "edit-selected-tags",
+      dropdownId: "edit-tag-dropdown"
+
+    });
 
   loadProducts(container);
 });
@@ -127,10 +154,10 @@ window.getOneProduct = async (productId) => {
       document.getElementById("edit-name").value = productItem.name;
       document.getElementById("edit-author").value = productItem.author;
       document.getElementById("edit-publishedYear").value = productItem.publishedYear;
-      setSelectedGenres(
+      editGenreSelector.setSelected(
         productItem.genres || []
       );
-      setSelectedTags(
+      editTagSelector.setSelected(
         productItem.tags || []
       );
       document.getElementById("edit-details").value = productItem.details;
@@ -157,8 +184,8 @@ window.updateProduct = async (event) => {
     name: document.getElementById("edit-name").value,
     author: document.getElementById("edit-author").value,
     publishedYear: Number(document.getElementById("edit-publishedYear").value),
-    genres: getSelectedGenres(),
-    tags: getSelectedTags(),
+    genres: editGenreSelector.getSelected(),
+    tags: editTagSelector.getSelected(),
     details: document.getElementById("edit-details").value,
     summary: document.getElementById("edit-summary").value,
     price: Number(document.getElementById("edit-price").value),
@@ -193,6 +220,10 @@ window.updateProduct = async (event) => {
     );
 
     showToast("✅ Cập nhật thành công!", "success");
+
+    editGenreSelector.clear();
+    editTagSelector.clear();
+
     closeModal2();
     loadProducts(document.getElementById("content"));
   } catch (error) {
@@ -219,6 +250,11 @@ async function AddProduct(newProduct) {
 
     showToast("✅ Thêm sản phẩm thành công!", "success");
 
+    // Reset form
+    document.getElementById("form-new-product").reset();
+    addGenreSelector.clear();
+    addTagSelector.clear();
+
     loadProducts(document.getElementById("content"));
 
   } catch (error) {
@@ -236,8 +272,8 @@ async function handleAddProduct() {
     name: document.getElementById("name").value,
     author: document.getElementById("author").value,
     publishedYear: Number(document.getElementById("publishedYear").value),
-    genres: getSelectedGenres(),
-    tags: getSelectedTags(),
+    genres: addGenreSelector.getSelected(),
+    tags: addTagSelector.getSelected(),
     details: document.getElementById("details").value,
     summary: document.getElementById("summary").value,
     price: Number(document.getElementById("price").value),

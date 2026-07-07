@@ -70,29 +70,24 @@
                         <input type="number" id="publishedYear" name="publishedYear" required />
                     </div>
                     <div class="form-group">
-
                         <label>Genres</label>
 
-                        <div id="selected-genres" class="border rounded p-2 min-h-[50px]">
+                        <div id="selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
+
+                        <input id="genre-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhập hoặc tìm thể loại..." />
+
+                        <div id="genre-dropdown"
+                            class="border rounded mt-1 bg-white shadow hidden max-h-52 overflow-y-auto">
                         </div>
-
-                        <input id="genre-input" type="text" placeholder="Type genre..."
-                            class="w-full border rounded mt-2 p-2">
-
-                        <div id="genre-dropdown" class="border rounded shadow bg-white hidden max-h-48 overflow-y-auto">
-                        </div>
-
                     </div>
                     <div class="form-group">
-
                         <label>Tags</label>
 
-                        <div id="selected-tags" class="border rounded p-2 min-h-[50px]">
-                        </div>
+                        <div id="selected-tags" class="flex flex-wrap gap-2 mb-2"></div>
 
-                        <input id="tag-input" type="text" placeholder="Type tag then press Enter..."
-                            class="w-full border rounded mt-2 p-2">
-
+                        <input id="tag-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhấn Enter để thêm tag" />
                     </div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>
@@ -143,6 +138,26 @@
                     <div class="form-group">
                         <label for="publishedYear">Năm xuất bản</label>
                         <input type="number" id="edit-publishedYear" name="publishedYear" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Genres</label>
+
+                        <div id="edit-selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
+
+                        <input id="edit-genre-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhập hoặc tìm thể loại..." />
+
+                        <div id="edit-genre-dropdown"
+                            class="border rounded mt-1 bg-white shadow hidden max-h-52 overflow-y-auto">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tags</label>
+
+                        <div id="edit-selected-tags" class="flex flex-wrap gap-2 mb-2"></div>
+
+                        <input id="edit-tag-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhấn Enter để thêm tag" />
                     </div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>

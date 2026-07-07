@@ -1,72 +1,317 @@
-let selectedTags = [];
+// src/js/components/tagSelector.js
 
-let input;
-let container;
+import { db } from "../firebase-config.js";
 
-export function initTagSelector(inputId, containerId) {
+import {
+    collection,
+    getDocs,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    input = document.getElementById(inputId);
-    container = document.getElementById(containerId);
+export async function initTagSelector({
+    inputId,
+    selectedId,
+    dropdownId
+}) {
 
-    render();
+    const input = document.getElementById(inputId);
+    const selectedBox = document.getElementById(selectedId);
+    const dropdown = document.getElementById(dropdownId);
 
-    input.addEventListener("keydown", e => {
+    let tags = [];
+    let selectedTags = [];
 
-        if (e.key !== "Enter") return;
+    //--------------------------------------------------
+    // Load Firestore
+    //--------------------------------------------------
 
-        e.preventDefault();
+    async function loadTags() {
 
-        const tag = input.value.trim();
+        tags = [];
 
-        if (!tag) return;
+        const snapshot = await getDocs(
+            collection(db, "tags")
+        );
 
-        if (!selectedTags.includes(tag)) {
+        snapshot.forEach(doc => {
 
-            selectedTags.push(tag);
+            tags.push(doc.data().name);
 
-            render();
+        });
+
+        tags.sort();
+
+    }
+
+    await loadTags();
+
+    //--------------------------------------------------
+    // Render chips
+    //--------------------------------------------------
+
+    function renderSelected() {
+
+        selectedBox.innerHTML = "";
+
+        selectedTags.forEach(tag => {
+
+            const chip = document.createElement("div");
+
+            chip.className =
+                "inline-flex items-center bg-blue-100 text-blue-700 rounded-full px-3 py-1 text-sm mr-2 mb-2";
+
+            chip.innerHTML = `
+                ${tag}
+                <button
+                    class="ml-2 text-red-500"
+                    type="button">
+                    ✕
+                </button>
+            `;
+
+            chip.querySelector("button").onclick = () => {
+
+                selectedTags =
+                    selectedTags.filter(
+                        t => t !== tag
+                    );
+
+                renderSelected();
+
+            };
+
+            selectedBox.appendChild(chip);
+
+        });
+
+    }
+
+    //--------------------------------------------------
+    // Add tag
+    //--------------------------------------------------
+
+    async function addTag(name) {
+
+        name = name.trim();
+
+        if (!name) return;
+
+        if (selectedTags.includes(name)) {
+
+            input.value = "";
+
+            dropdown.innerHTML = "";
+
+            return;
+
         }
 
+        const existed =
+            tags.find(
+                t =>
+                    t.toLowerCase() ===
+                    name.toLowerCase()
+            );
+
+        if (existed) {
+
+            selectedTags.push(existed);
+
+        } else {
+
+            await addDoc(
+                collection(db, "tags"),
+                {
+                    name
+                }
+            );
+
+            tags.push(name);
+
+            tags.sort();
+
+            selectedTags.push(name);
+
+        }
+
+        renderSelected();
+
         input.value = "";
-    });
-}
 
-function render() {
+        dropdown.innerHTML = "";
 
-    container.innerHTML = "";
+    }
 
-    selectedTags.forEach(tag => {
+    //--------------------------------------------------
+    // Dropdown
+    //--------------------------------------------------
 
-        const div = document.createElement("div");
+    function showDropdown(keyword = "") {
 
-        div.className =
-            "inline-flex items-center bg-green-500 text-white rounded-full px-3 py-1 m-1";
+        dropdown.innerHTML = "";
 
-        div.innerHTML = `
-            <span>${tag}</span>
-            <button class="ml-2">✕</button>
-        `;
+        keyword =
+            keyword.trim().toLowerCase();
 
-        div.querySelector("button").onclick = () => {
+        if (!keyword)
+            return;
 
-            selectedTags =
-                selectedTags.filter(t => t !== tag);
+        const filtered = tags.filter(tag =>
+            tag
+                .toLowerCase()
+                .includes(keyword)
+            &&
+            !selectedTags.includes(tag)
+        );
 
-            render();
-        };
+        filtered.forEach(tag => {
 
-        container.appendChild(div);
-    });
-}
+            const item =
+                document.createElement("div");
 
-export function getSelectedTags() {
+            item.className =
+                "px-3 py-2 hover:bg-gray-100 cursor-pointer";
 
-    return [...selectedTags];
-}
+            item.textContent = tag;
 
-export function setSelectedTags(tags = []) {
+            item.onclick =
+                () => addTag(tag);
 
-    selectedTags = [...tags];
+            dropdown.appendChild(item);
 
-    render();
+        });
+
+        if (
+            !tags.some(
+                t =>
+                    t.toLowerCase() === keyword
+            )
+        ) {
+
+            const create =
+                document.createElement("div");
+
+            create.className =
+                "px-3 py-2 bg-green-50 text-green-700 cursor-pointer";
+
+            create.innerHTML =
+                `➕ Create "<b>${input.value.trim()}</b>"`;
+
+            create.onclick =
+                () => addTag(
+                    input.value
+                );
+
+            dropdown.appendChild(create);
+
+        }
+
+    }
+
+    //--------------------------------------------------
+    // Events
+    //--------------------------------------------------
+
+    input.addEventListener(
+        "input",
+        () => {
+
+            showDropdown(
+                input.value
+            );
+
+        }
+    );
+
+    input.addEventListener(
+        "focus",
+        () => {
+
+            showDropdown(
+                input.value
+            );
+
+        }
+    );
+
+    input.addEventListener(
+        "keydown",
+        async e => {
+
+            if (
+                e.key === "Enter" ||
+                e.key === ","
+            ) {
+
+                e.preventDefault();
+
+                await addTag(
+                    input.value
+                );
+
+            }
+
+            if (
+                e.key === "Backspace" &&
+                input.value === "" &&
+                selectedTags.length
+            ) {
+
+                selectedTags.pop();
+
+                renderSelected();
+
+            }
+
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        e => {
+
+            if (
+                !dropdown.contains(
+                    e.target
+                ) &&
+                e.target !== input
+            ) {
+
+                dropdown.innerHTML = "";
+
+            }
+
+        }
+    );
+
+    //--------------------------------------------------
+
+    renderSelected();
+
+    return {
+
+        getSelected() {
+
+            return [...selectedTags];
+
+        },
+
+        setSelected(arr) {
+
+            selectedTags = [...arr];
+
+            renderSelected();
+
+        },
+
+        clear() {
+
+            selectedTags = [];
+
+            renderSelected();
+
+        }
+
+    };
+
 }
