@@ -1,9 +1,9 @@
 // ✅ index.js (Firebase v10 Modular)
 import { db } from "./firebase-config.js";
 import { showToast } from "./toast.js";
-import {
-  createSelector
-} from "./components/GenreandTagSelector.js";
+
+import { initGenreSelector } from "./components/GenreSelector.js";
+import { createSelector } from "./components/TagSelector.js";
 
 import {
   collection,
