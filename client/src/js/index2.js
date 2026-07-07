@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("content");
 
   selectors.addGenre =
-    await initGenreSelector({
+    await createSelector({
 
       collectionName: "genres",
 
@@ -32,14 +32,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       dropdownId: "genre-dropdown",
 
-      addBtnId: "genre-add-btn", // ✅ nút "+ Add Genre" cạnh ô search
-
       createLabel: "Create Genre"
 
     });
 
   selectors.editGenre =
-    await initGenreSelector({
+    await createSelector({
 
       collectionName: "genres",
 
@@ -48,8 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       selectedId: "edit-selected-genres",
 
       dropdownId: "edit-genre-dropdown",
-
-      addBtnId: "edit-genre-add-btn", // ✅ nút "+ Add Genre" cho form sửa
 
       createLabel: "Create Genre"
 
@@ -113,10 +109,6 @@ async function loadProducts(container) {
 window.deleteProduct = async (productId) => {
   if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
     try {
-      // ✅ Lấy genres trước khi xoá để giảm usageCount tương ứng
-      const docSnap = await getDoc(doc(db, "products", productId));
-      const oldGenres = docSnap.exists() ? (docSnap.data().genres || []) : [];
-
       await deleteDoc(doc(db, "products", productId));
 
       await fetch(
@@ -125,10 +117,6 @@ window.deleteProduct = async (productId) => {
           method: "DELETE"
         }
       );
-
-      if (oldGenres.length) {
-        await selectors.addGenre.recordUsage(oldGenres, []);
-      }
 
       showToast("✅ Đã xóa sản phẩm!", "success");
       loadProducts(document.getElementById("content"));
@@ -154,9 +142,6 @@ window.getOneProduct = async (productId) => {
       selectors.editGenre.setSelected(
         productItem.genres || []
       );
-      // ✅ Lưu lại genres gốc để tính chênh lệch khi cập nhật
-      document.getElementById("form-edit-product").dataset.originalGenres =
-        JSON.stringify(productItem.genres || []);
       document.getElementById("edit-details").value = productItem.details;
       document.getElementById("edit-summary").value = productItem.summary;
       document.getElementById("edit-price").value = productItem.price;
@@ -175,19 +160,13 @@ window.getOneProduct = async (productId) => {
 // ✅ Cập nhật sản phẩm
 window.updateProduct = async (event) => {
   event.preventDefault();
-  const formEl = document.getElementById("form-edit-product");
-  const productID = formEl.dataset.productId;
-
-  // ✅ genres trước khi sửa (lấy lại từ lúc mở modal)
-  const oldGenres = JSON.parse(formEl.dataset.originalGenres || "[]");
-  const newGenres = selectors.editGenre.getSelected();
-
+  const productID = document.getElementById("form-edit-product").dataset.productId;
   let picture = document.getElementById("edit-picture").files[0];
   let productDataUpdate = {
     name: document.getElementById("edit-name").value,
     author: document.getElementById("edit-author").value,
     publishedYear: Number(document.getElementById("edit-publishedYear").value),
-    genres: newGenres,
+    genres: selectors.editGenre.getSelected(),
     details: document.getElementById("edit-details").value,
     summary: document.getElementById("edit-summary").value,
     price: Number(document.getElementById("edit-price").value),
@@ -221,9 +200,6 @@ window.updateProduct = async (event) => {
       }
     );
 
-    // ✅ Cập nhật usageCount theo chênh lệch genres cũ/mới
-    await selectors.editGenre.recordUsage(oldGenres, newGenres);
-
     showToast("✅ Cập nhật thành công!", "success");
 
     selectors.editGenre.clear();
@@ -251,9 +227,6 @@ async function AddProduct(newProduct) {
         method: "POST"
       }
     );
-
-    // ✅ Tăng usageCount cho các thể loại vừa dùng
-    await selectors.addGenre.recordUsage([], newProduct.genres || []);
 
     showToast("✅ Thêm sản phẩm thành công!", "success");
 

@@ -69,15 +69,18 @@
                         <label for="publishedYear">Năm xuất bản</label>
                         <input type="number" id="publishedYear" name="publishedYear" required />
                     </div>
-                    <div class="flex gap-2">
-                        <input id="genre-input" type="text" placeholder="Search genre..."
-                            class="border rounded px-3 py-2 flex-1">
-                        <button type="button" id="genre-add-btn" class="bg-indigo-600 text-white px-3 py-2 rounded">+
-                            Add Genre</button>
+                    <div class="form-group relative">
+                        <label>Genres</label>
+
+                        <div id="selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
+
+                        <input id="genre-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhập hoặc tìm thể loại..." />
+
+                        <div id="genre-dropdown"
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
+                        </div>
                     </div>
-                    <div id="genre-dropdown" class="hidden border rounded shadow bg-white max-h-64 overflow-y-auto">
-                    </div>
-                    <div id="selected-genres" class="mt-2"></div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>
                         <textarea id="details" name="details" rows="8" required></textarea>
@@ -128,15 +131,18 @@
                         <label for="publishedYear">Năm xuất bản</label>
                         <input type="number" id="edit-publishedYear" name="publishedYear" required>
                     </div>
-                    <div class="flex gap-2">
-                        <input id="edit-genre-input" type="text" placeholder="Search genre..."
-                            class="border rounded px-3 py-2 flex-1">
-                        <button type="button" id="edit-genre-add-btn" class="bg-indigo-600 text-white px-3 py-2 rounded">+
-                            Add Genre</button>
+                    <div class="form-group relative">
+                        <label>Genres</label>
+
+                        <div id="edit-selected-genres" class="flex flex-wrap gap-2 mb-2"></div>
+
+                        <input id="edit-genre-input" type="text" class="w-full border rounded p-2"
+                            placeholder="Nhập hoặc tìm thể loại..." />
+
+                        <div id="edit-genre-dropdown"
+                            class="absolute left-0 right-0 z-50 mt-1 bg-white border rounded shadow max-h-56 overflow-y-auto hidden">
+                        </div>
                     </div>
-                    <div id="edit-genre-dropdown" class="hidden border rounded shadow bg-white max-h-64 overflow-y-auto">
-                    </div>
-                    <div id="edit-selected-genres" class="mt-2"></div>
                     <div class="form-group">
                         <label for="details">Chi tiết sản phẩm</label>
                         <textarea id="edit-details" name="details" rows="8" required></textarea>

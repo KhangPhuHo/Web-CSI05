@@ -3,13 +3,22 @@ import { db } from "../firebase-config.js";
 import {
     collection,
     getDocs,
-    addDoc
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    increment,
+    query,
+    where,
+    arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 export async function initGenreSelector({
     inputId,
     selectedId,
-    dropdownId
+    dropdownId,
+    addBtnId = null,   // optional: id của nút "+ Add Genre" cạnh ô search
+    popularCount = 5    // số lượng thể loại hiển thị trong mục "Popular"
 }) {
 
     //--------------------------------------------------
@@ -24,6 +33,9 @@ export async function initGenreSelector({
 
     const dropdown =
         document.getElementById(dropdownId);
+
+    const addBtn =
+        addBtnId ? document.getElementById(addBtnId) : null;
 
     if (
         !input ||
@@ -47,6 +59,7 @@ export async function initGenreSelector({
     // State
     //--------------------------------------------------
 
+    // genres: [{ id, name, usageCount }]
     let genres = [];
 
     let selectedGenres = [];
@@ -82,28 +95,49 @@ export async function initGenreSelector({
                 collection(db, "genres")
             );
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(docSnap => {
 
-            const data = doc.data();
+            const data = docSnap.data();
 
             if (
                 data.name &&
-                !genres.includes(data.name)
+                !genres.some(g => g.name === data.name)
             ) {
 
-                genres.push(data.name);
+                genres.push({
+                    id: docSnap.id,
+                    name: data.name,
+                    usageCount: data.usageCount || 0
+                });
 
             }
 
         });
 
-        genres.sort((a, b) =>
-            a.localeCompare(b)
+    }
+
+    await loadGenres();
+
+    //--------------------------------------------------
+    // Helpers: sort / popular
+    //--------------------------------------------------
+
+    function sortByName(list) {
+
+        return [...list].sort(
+            (a, b) => a.name.localeCompare(b.name)
         );
 
     }
 
-    await loadGenres();
+    function getPopular(matching) {
+
+        return [...matching]
+            .filter(g => g.usageCount > 0)
+            .sort((a, b) => b.usageCount - a.usageCount)
+            .slice(0, popularCount);
+
+    }
 
     //--------------------------------------------------
     // Render selected chips
@@ -149,15 +183,349 @@ export async function initGenreSelector({
         });
 
     }
+
+    //--------------------------------------------------
+    // Firestore mutations
+    //--------------------------------------------------
+
+    async function createGenre(value) {
+
+        const exists =
+            genres.find(
+                g =>
+                    g.name.toLowerCase() ===
+                    value.toLowerCase()
+            );
+
+        if (exists) {
+
+            if (!selectedGenres.includes(exists.name)) {
+
+                selectedGenres.push(exists.name);
+
+                renderSelected();
+
+            }
+
+            input.value = "";
+
+            hideDropdown();
+
+            return;
+
+        }
+
+        const docRef =
+            await addDoc(
+                collection(db, "genres"),
+                {
+                    name: value,
+                    usageCount: 0
+                }
+            );
+
+        genres.push({
+            id: docRef.id,
+            name: value,
+            usageCount: 0
+        });
+
+        selectedGenres.push(value);
+
+        renderSelected();
+
+        input.value = "";
+
+        hideDropdown();
+
+    }
+
+    async function renameGenreInProducts(oldName, newName) {
+
+        const q =
+            query(
+                collection(db, "products"),
+                where("genres", "array-contains", oldName)
+            );
+
+        const snapshot = await getDocs(q);
+
+        for (const productDoc of snapshot.docs) {
+
+            const data = productDoc.data();
+
+            const updatedGenres =
+                Array.from(
+                    new Set(
+                        (data.genres || []).map(
+                            g => (g === oldName ? newName : g)
+                        )
+                    )
+                );
+
+            await updateDoc(
+                doc(db, "products", productDoc.id),
+                { genres: updatedGenres }
+            );
+
+        }
+
+    }
+
+    async function removeGenreFromProducts(name) {
+
+        const q =
+            query(
+                collection(db, "products"),
+                where("genres", "array-contains", name)
+            );
+
+        const snapshot = await getDocs(q);
+
+        for (const productDoc of snapshot.docs) {
+
+            await updateDoc(
+                doc(db, "products", productDoc.id),
+                { genres: arrayRemove(name) }
+            );
+
+        }
+
+    }
+
+    async function editGenre(genreObj) {
+
+        const newName =
+            prompt("Sửa tên thể loại:", genreObj.name);
+
+        if (newName === null)
+            return;
+
+        const trimmed = newName.trim();
+
+        if (!trimmed || trimmed === genreObj.name)
+            return;
+
+        const duplicate =
+            genres.find(
+                g =>
+                    g.id !== genreObj.id &&
+                    g.name.toLowerCase() === trimmed.toLowerCase()
+            );
+
+        if (duplicate) {
+
+            alert("Thể loại này đã tồn tại!");
+
+            return;
+
+        }
+
+        const oldName = genreObj.name;
+
+        await updateDoc(
+            doc(db, "genres", genreObj.id),
+            { name: trimmed }
+        );
+
+        await renameGenreInProducts(oldName, trimmed);
+
+        genreObj.name = trimmed;
+
+        selectedGenres =
+            selectedGenres.map(
+                n => (n === oldName ? trimmed : n)
+            );
+
+        renderSelected();
+
+        renderDropdown(input.value);
+
+    }
+
+    async function removeGenre(genreObj) {
+
+        if (
+            !confirm(
+                `Xoá thể loại "${genreObj.name}"? Thể loại này sẽ được gỡ khỏi các sản phẩm đang dùng.`
+            )
+        )
+            return;
+
+        await deleteDoc(
+            doc(db, "genres", genreObj.id)
+        );
+
+        await removeGenreFromProducts(genreObj.name);
+
+        genres = genres.filter(g => g.id !== genreObj.id);
+
+        selectedGenres =
+            selectedGenres.filter(n => n !== genreObj.name);
+
+        renderSelected();
+
+        renderDropdown(input.value);
+
+    }
+
     //--------------------------------------------------
     // Render dropdown
     //--------------------------------------------------
 
-    function renderDropdown(list, keyword = "") {
+    function appendSectionHeader(label) {
+
+        const header =
+            document.createElement("div");
+
+        header.className =
+            "px-3 pt-2 pb-1 text-xs font-semibold uppercase text-gray-400";
+
+        header.textContent = label;
+
+        dropdown.appendChild(header);
+
+    }
+
+    function appendGenreRow(genreObj) {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "flex items-center justify-between px-3 py-2 hover:bg-gray-100 transition";
+
+        const name =
+            document.createElement("span");
+
+        name.className = "cursor-pointer flex-1 truncate";
+
+        name.textContent = genreObj.name;
+
+        name.onclick = () => {
+
+            if (!selectedGenres.includes(genreObj.name)) {
+
+                selectedGenres.push(genreObj.name);
+
+                renderSelected();
+
+            }
+
+            input.value = "";
+
+            hideDropdown();
+
+        };
+
+        const actions =
+            document.createElement("div");
+
+        actions.className = "flex items-center gap-2 ml-2 shrink-0";
+
+        const addButton =
+            document.createElement("button");
+
+        addButton.type = "button";
+
+        addButton.className =
+            "text-green-600 hover:text-green-800";
+
+        addButton.textContent = "+";
+
+        addButton.title = "Thêm vào lựa chọn";
+
+        addButton.onclick = (e) => {
+
+            e.stopPropagation();
+
+            name.onclick();
+
+        };
+
+        const editButton =
+            document.createElement("button");
+
+        editButton.type = "button";
+
+        editButton.className =
+            "text-blue-500 hover:text-blue-700";
+
+        editButton.textContent = "✏️";
+
+        editButton.title = "Sửa";
+
+        editButton.onclick = (e) => {
+
+            e.stopPropagation();
+
+            editGenre(genreObj);
+
+        };
+
+        const deleteButton =
+            document.createElement("button");
+
+        deleteButton.type = "button";
+
+        deleteButton.className =
+            "text-red-500 hover:text-red-700";
+
+        deleteButton.textContent = "🗑";
+
+        deleteButton.title = "Xoá";
+
+        deleteButton.onclick = (e) => {
+
+            e.stopPropagation();
+
+            removeGenre(genreObj);
+
+        };
+
+        actions.appendChild(addButton);
+
+        actions.appendChild(editButton);
+
+        actions.appendChild(deleteButton);
+
+        row.appendChild(name);
+
+        row.appendChild(actions);
+
+        dropdown.appendChild(row);
+
+    }
+
+    function appendCreateRow(value) {
+
+        const create =
+            document.createElement("div");
+
+        create.className =
+            "px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 cursor-pointer font-medium";
+
+        create.innerHTML =
+            `➕ Create "<b>${value}</b>"`;
+
+        create.onclick = () => createGenre(value);
+
+        dropdown.appendChild(create);
+
+    }
+
+    function renderDropdown(keyword = "") {
 
         dropdown.innerHTML = "";
 
-        if (!list.length && !keyword.trim()) {
+        const kw = keyword.trim().toLowerCase();
+
+        const matching =
+            genres.filter(
+                g => g.name.toLowerCase().includes(kw)
+            );
+
+        if (!matching.length && !kw) {
 
             hideDropdown();
 
@@ -167,165 +535,60 @@ export async function initGenreSelector({
 
         showDropdown();
 
-        //------------------------------------------
-        // Existing genres
-        //------------------------------------------
+        const popular = getPopular(matching);
 
-        list.forEach(name => {
+        const popularIds = new Set(popular.map(g => g.id));
 
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "px-3 py-2 hover:bg-gray-100 cursor-pointer transition";
-
-            item.textContent = name;
-
-            item.onclick = () => {
-
-                if (
-                    !selectedGenres.includes(name)
-                ) {
-
-                    selectedGenres.push(name);
-
-                    renderSelected();
-
-                }
-
-                input.value = "";
-
-                hideDropdown();
-
-            };
-
-            dropdown.appendChild(item);
-
-        });
-
-        //------------------------------------------
-        // Create new genre
-        //------------------------------------------
-
-        const value =
-            keyword.trim();
-
-        if (!value)
-            return;
-
-        const existedGenre =
-            genres.find(
-                g =>
-                    g.toLowerCase() ===
-                    value.toLowerCase()
+        const others =
+            sortByName(
+                matching.filter(g => !popularIds.has(g.id))
             );
 
-        if (!existedGenre) {
+        if (popular.length) {
 
-            const create =
-                document.createElement("div");
+            appendSectionHeader("Popular");
 
-            create.className =
-                "px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 cursor-pointer font-medium";
+            popular.forEach(appendGenreRow);
 
-            create.innerHTML =
-                `➕ Create "<b>${value}</b>"`;
+        }
 
-            create.onclick =
-                async () => {
+        if (others.length) {
 
-                    //----------------------------------
-                    // Save Firestore
-                    //----------------------------------
+            appendSectionHeader("All Genres");
 
-                    await addDoc(
-                        collection(db, "genres"),
-                        {
-                            name: value
-                        }
-                    );
+            others.forEach(appendGenreRow);
 
-                    //----------------------------------
-                    // Update local
-                    //----------------------------------
+        }
 
-                    genres.push(value);
+        if (kw) {
 
-                    genres.sort(
-                        (a, b) =>
-                            a.localeCompare(b)
-                    );
+            const existed =
+                genres.find(
+                    g => g.name.toLowerCase() === kw
+                );
 
-                    selectedGenres.push(value);
+            if (!existed) {
 
-                    renderSelected();
+                appendCreateRow(keyword.trim());
 
-                    input.value = "";
-
-                    hideDropdown();
-
-                };
-
-            dropdown.appendChild(create);
+            }
 
         }
 
     }
 
-    //--------------------------------------------------
-    // Search
-    //--------------------------------------------------
-
-    function filterGenres(keyword = "") {
-
-        keyword =
-            keyword
-                .trim()
-                .toLowerCase();
-
-        const filtered =
-            genres.filter(name => {
-
-                return (
-
-                    !selectedGenres.includes(name)
-
-                    &&
-
-                    name
-                        .toLowerCase()
-                        .includes(keyword)
-
-                );
-
-            });
-
-        renderDropdown(
-            filtered,
-            input.value
-        );
-
-    }
     //--------------------------------------------------
     // Events
     //--------------------------------------------------
 
     input.addEventListener(
         "input",
-        () => {
-
-            filterGenres(input.value);
-
-        }
+        () => renderDropdown(input.value)
     );
 
     input.addEventListener(
         "focus",
-        () => {
-
-            filterGenres(input.value);
-
-        }
+        () => renderDropdown(input.value)
     );
 
     input.addEventListener(
@@ -356,12 +619,34 @@ export async function initGenreSelector({
 
                 renderSelected();
 
-                filterGenres("");
+                renderDropdown("");
 
             }
 
         }
     );
+
+    if (addBtn) {
+
+        addBtn.addEventListener("click", () => {
+
+            const value = input.value.trim();
+
+            if (value) {
+
+                createGenre(value);
+
+            } else {
+
+                input.focus();
+
+                renderDropdown("");
+
+            }
+
+        });
+
+    }
 
     //--------------------------------------------------
     // Click outside
@@ -373,7 +658,8 @@ export async function initGenreSelector({
 
             if (
                 !dropdown.contains(e.target) &&
-                !input.contains(e.target)
+                !input.contains(e.target) &&
+                (!addBtn || !addBtn.contains(e.target))
             ) {
 
                 hideDropdown();
@@ -426,6 +712,53 @@ export async function initGenreSelector({
             input.value = "";
 
             hideDropdown();
+
+        },
+
+        //--------------------------------------
+        // Cập nhật usageCount cho "Popular"
+        // Gọi sau khi thêm/sửa/xoá sản phẩm thành công
+        // oldGenres: mảng tên thể loại trước khi lưu
+        // newGenres: mảng tên thể loại sau khi lưu
+        //--------------------------------------
+
+        async recordUsage(oldGenres = [], newGenres = []) {
+
+            const added =
+                newGenres.filter(n => !oldGenres.includes(n));
+
+            const removed =
+                oldGenres.filter(n => !newGenres.includes(n));
+
+            for (const name of added) {
+
+                const g = genres.find(x => x.name === name);
+
+                if (!g) continue;
+
+                await updateDoc(
+                    doc(db, "genres", g.id),
+                    { usageCount: increment(1) }
+                );
+
+                g.usageCount += 1;
+
+            }
+
+            for (const name of removed) {
+
+                const g = genres.find(x => x.name === name);
+
+                if (!g) continue;
+
+                await updateDoc(
+                    doc(db, "genres", g.id),
+                    { usageCount: increment(-1) }
+                );
+
+                g.usageCount = Math.max(0, g.usageCount - 1);
+
+            }
 
         }
 
