@@ -3,7 +3,7 @@ import { db } from "./firebase-config.js";
 import { showToast } from "./toast.js";
 
 import { initGenreSelector } from "./components/genreSelector.js";
-import { createSelector } from "./components/tagSelector.js";
+import { createSelector } from "./components/TagSelector.js";
 
 import {
   collection,
