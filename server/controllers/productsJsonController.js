@@ -25,8 +25,12 @@ exports.getProductsJson = (req, res) => {
 
 // Download
 exports.downloadProductsJson = (req, res) => {
-
-    res.download(PRODUCTS_JSON_PATH);
+    res.set({
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    });
+    res.download(PRODUCTS_JSON_PATH, "products.json");
 };
 
 // Lấy 1 product

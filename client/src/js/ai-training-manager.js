@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .addEventListener("click", () => {
 
             window.open(
-                `${API_BASE_URL}/api/products-json/download`,
+                `${API_BASE_URL}/api/products-json/download?t=${Date.now()}`,
                 "_blank"
             );
 
