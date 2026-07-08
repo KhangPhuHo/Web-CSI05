@@ -35,9 +35,6 @@ CAU HOI: {question}
 
 HUONG DAN TRA LOI:
 - Tra loi DUA TREN thong tin trong tai lieu o tren
-- Moi doan tai lieu co the kem theo dong thong tin san pham (Ten sach/Tac gia/The loai/Gia/Ton kho)
-  ngay truoc noi dung - neu cau hoi la ve gia, con hang hay khong, hoac the loai, hay lay
-  TRUC TIEP tu dong thong tin nay, khong can suy dien tu phan noi dung ben duoi
 - Trich dan hoac de cap den phan tai lieu ban dung
 - Neu tai lieu khong co du thong tin, hay noi thang: "Tai lieu khong co thong tin ve van de nay"
 - Tra loi bang tieng Viet, ro rang va de hieu
@@ -70,7 +67,7 @@ if __name__ == "__main__":
     print("=" * 50)
 
     from step2_embed_store import create_embedding_model, load_vector_store
-    from step3_retrieve import search_relevant_chunks, format_context, load_live_products
+    from step3_retrieve import search_relevant_chunks, format_context
 
     print("\nChuan bi he thong...")
     embedding_model = create_embedding_model()
@@ -78,13 +75,10 @@ if __name__ == "__main__":
     llm = create_llm()
     chain = create_qa_chain(llm)
 
-    # Doc gia/ton kho MOI NHAT tu products.json (xem giai thich trong step3_retrieve.py)
-    live_products = load_live_products("data/text/products.json")
-
     questions = [
-        "Sách Phương Pháp Học Tập Feynman giá bao nhiêu và còn hàng không?",
-        "Sách Súng, Vi Trùng Và Thép thuộc thể loại gì?",
-        "Có sách nào nói về mâu thuẫn gia đình trong xã hội đổi mới không?",
+        "Phuong phap SAVERS trong thoi quen buoi sang gom nhung gi?",
+        "Tu duy phat trien (Growth Mindset) khac tu duy co dinh o diem nao?",
+        "Ky thuat Pomodoro hoat dong nhu the nao?",
     ]
 
     for question in questions:
@@ -92,7 +86,7 @@ if __name__ == "__main__":
         print(f"Cau hoi: {question}")
 
         results = search_relevant_chunks(vector_store, question, top_k=3)
-        context = format_context(results, live_products)
+        context = format_context(results)
 
         answer = answer_question(chain, context, question)
 

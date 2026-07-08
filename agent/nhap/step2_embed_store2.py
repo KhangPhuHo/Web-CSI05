@@ -75,7 +75,7 @@ if __name__ == "__main__":
     print("=" * 50)
 
     print("\n[1/3] Doc va chia van ban...")
-    docs = doc_load("data/text/products.json")
+    docs = doc_load("data/sach_mau.txt")
     chunks = split_documents(docs)
 
     print("\n[2/3] Tao embedding model...")

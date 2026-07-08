@@ -21,8 +21,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "doc_loaded" not in st.session_state:
     st.session_state.doc_loaded = False
-if "image_result" not in st.session_state:
-    st.session_state.image_result = None
 
 # Sidebar ben trai: cac thao tac cai dat
 with st.sidebar:
@@ -40,8 +38,8 @@ with st.sidebar:
     if doc_source == "Upload file cua toi":
         uploaded_file = st.file_uploader(
             "Chon file",
-            type=["json", "txt", "pdf", "docx"],
-            help="Ho tro .json (san pham sach), .txt, .pdf, .docx"
+            type=["txt", "pdf", "docx"],
+            help="Ho tro .txt, .pdf, .docx"
         )
         if uploaded_file:
             st.caption(f"{uploaded_file.name} - {uploaded_file.size // 1024} KB")
@@ -54,9 +52,9 @@ with st.sidebar:
                     st.session_state.chatbot = RAGChatbot()
 
                 if doc_source == "Dung file mau co san":
-                    file_path = "data/products.json"
+                    file_path = "data/sach_mau.txt"
                     if not os.path.exists(file_path):
-                        st.error("Khong tim thay data/products.json")
+                        st.error("Khong tim thay data/sach_mau.txt")
                         st.stop()
                     st.session_state.chatbot.load_documents(file_path)
                 else:
@@ -92,66 +90,17 @@ with st.sidebar:
     # Cac cau hoi goi y giup nguoi dung biet nen hoi gi
     st.subheader("Cau hoi goi y")
     suggestions = [
-        "Sách Phương Pháp Học Tập Feynman giá bao nhiêu?",
-        "Sách Súng, Vi Trùng Và Thép còn hàng không?",
-        "Sách Mùa Lá Rụng Trong Vườn thuộc thể loại gì?",
-        "Có sách nào nói về cách học nhanh, nhớ lâu không?",
-        "Gợi ý cho mình 1 cuốn sách về lịch sử văn minh nhân loại",
+        "Thoi quen buoi sang SAVERS gom nhung gi?",
+        "Vong lap thoi quen hoat dong nhu the nao?",
+        "Ma tran Eisenhower chia cong viec the nao?",
+        "Growth Mindset va Fixed Mindset khac nhau ra sao?",
+        "Tap the duc bao nhieu phut moi tuan?",
     ]
     for s in suggestions:
         if st.button(s, key=f"sug_{s[:18]}", use_container_width=True):
             # Luu cau hoi vao session_state roi rerun de dien vao o chat
             st.session_state["prefill"] = s
             st.rerun()
-
-    st.divider()
-
-    # ------------------------------------------------------------
-    # Goi y sach tu HINH ANH (Gemini Vision) - tinh nang moi
-    # ------------------------------------------------------------
-    st.subheader("Goi y tu hinh anh")
-    st.caption("Tai len 1 tam anh (khung canh, tam trang...), Gemini se doc anh va goi y sach phu hop.")
-
-    uploaded_image = st.file_uploader(
-        "Tai anh len",
-        type=["jpg", "jpeg", "png"],
-        key="image_uploader",
-        help="Ho tro .jpg, .jpeg, .png"
-    )
-
-    if uploaded_image:
-        st.image(uploaded_image, use_container_width=True)
-
-    if st.button(
-        "Goi y tu hinh anh",
-        type="primary",
-        use_container_width=True,
-        disabled=not st.session_state.doc_loaded
-    ):
-        if uploaded_image is None:
-            st.warning("Hay chon anh truoc khi nhan nut nay.")
-        else:
-            with st.spinner("Gemini Vision dang doc anh va tim sach phu hop..."):
-                try:
-                    image_bytes = uploaded_image.getvalue()
-                    ext = os.path.splitext(uploaded_image.name)[1].lower()
-                    mime_type = "image/png" if ext == ".png" else "image/jpeg"
-
-                    image_result = st.session_state.chatbot.recommend_from_image(
-                        image_bytes, mime_type=mime_type
-                    )
-
-                    # Luu lai de hien thi ben khu vuc chinh (main area)
-                    st.session_state.image_result = {
-                        "image_bytes": image_bytes,
-                        "description": image_result["image_description"],
-                        "answer": image_result["answer"],
-                        "sources": image_result["sources"]
-                    }
-                    st.rerun()
-
-                except Exception as e:
-                    st.error(f"Loi khi doc anh: {str(e)}")
 
 # Phan chinh: tieu de va khu vuc chat
 st.title("Hoi Dap Tai Lieu")
@@ -163,8 +112,8 @@ if not st.session_state.doc_loaded and not st.session_state.messages:
         "**Huong dan bat dau:**\n\n"
         "1. Sidebar ben trai — chon **Dung file mau** hoac **Upload file cua toi**\n"
         "2. Nhan **Nap Tai Lieu** va cho xu ly (10-30 giay)\n"
-        "3. Dat cau hoi ben duoi, hoac tai anh len o muc **Goi y tu hinh anh**\n\n"
-        "Ho tro dinh dang: .json (san pham sach), .txt, .pdf, .docx"
+        "3. Dat cau hoi ben duoi\n\n"
+        "Ho tro dinh dang: .txt, .pdf, .docx"
     )
 
 # Hien thi lich su toan bo cuoc chat
@@ -179,33 +128,6 @@ for msg in st.session_state.messages:
                     st.text(src[:400] + ("..." if len(src) > 400 else ""))
                     if i < len(msg["sources"]):
                         st.divider()
-
-# Ket qua "Goi y tu hinh anh" (neu co) - hien thi rieng, khong lan vao lich su chat text
-if st.session_state.image_result:
-    st.subheader("Ket qua goi y tu hinh anh")
-
-    col_img, col_info = st.columns([1, 2])
-    with col_img:
-        st.image(st.session_state.image_result["image_bytes"], use_container_width=True)
-    with col_info:
-        st.markdown("**Gemini Vision doc duoc:**")
-        st.write(st.session_state.image_result["description"])
-
-    st.markdown("**Goi y sach:**")
-    st.write(st.session_state.image_result["answer"])
-
-    with st.expander("Xem doan van tham khao"):
-        for i, src in enumerate(st.session_state.image_result["sources"], 1):
-            st.markdown(f"**Doan {i}:**")
-            st.text(src[:400] + ("..." if len(src) > 400 else ""))
-            if i < len(st.session_state.image_result["sources"]):
-                st.divider()
-
-    if st.button("Xoa ket qua nay"):
-        st.session_state.image_result = None
-        st.rerun()
-
-    st.divider()
 
 # prefill: neu nguoi dung nhan nut goi y, cau hoi duoc dien san vao day
 prefill_text = st.session_state.pop("prefill", "")

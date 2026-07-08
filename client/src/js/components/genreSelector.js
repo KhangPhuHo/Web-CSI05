@@ -445,7 +445,7 @@ export async function initGenreSelector({
         const name =
             document.createElement("span");
 
-        name.className = "cursor-pointer flex-1 truncate";
+        name.className = "cursor-pointer text-white-700 flex-1 truncate";
 
         name.textContent = genreObj.name;
 
