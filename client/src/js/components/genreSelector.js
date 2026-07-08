@@ -13,6 +13,80 @@ import {
     arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
+//--------------------------------------------------
+// Shared state giữa TẤT CẢ các selector trên cùng 1 trang
+// (form Thêm sản phẩm + form Sửa sản phẩm dùng chung 1
+// danh sách thể loại, để add/sửa/xoá ở đâu cũng đồng bộ)
+//--------------------------------------------------
+
+let sharedGenres = null;      // [{ id, name, usageCount }]
+let sharedLoadPromise = null;
+const genreListeners = new Set();
+
+async function ensureGenresLoaded() {
+
+    if (sharedGenres) return sharedGenres;
+
+    if (!sharedLoadPromise) {
+
+        sharedLoadPromise = (async () => {
+
+            const list = [];
+
+            const snapshot =
+                await getDocs(
+                    collection(db, "genres")
+                );
+
+            snapshot.forEach(docSnap => {
+
+                const data = docSnap.data();
+
+                if (
+                    data.name &&
+                    !list.some(g => g.name === data.name)
+                ) {
+
+                    list.push({
+                        id: docSnap.id,
+                        name: data.name,
+                        usageCount: data.usageCount || 0
+                    });
+
+                }
+
+            });
+
+            sharedGenres = list;
+
+        })();
+
+    }
+
+    await sharedLoadPromise;
+
+    return sharedGenres;
+
+}
+
+function notifyGenresChanged(event) {
+
+    genreListeners.forEach(fn => {
+
+        try {
+
+            fn(event);
+
+        } catch (err) {
+
+            console.error("Genre listener error:", err);
+
+        }
+
+    });
+
+}
+
 export async function initGenreSelector({
     inputId,
     selectedId,
@@ -59,8 +133,9 @@ export async function initGenreSelector({
     // State
     //--------------------------------------------------
 
-    // genres: [{ id, name, usageCount }]
-    let genres = [];
+    // genres: mảng DÙNG CHUNG với mọi selector khác trên trang
+    // (không copy riêng, để add/sửa/xoá đồng bộ ngay lập tức)
+    const genres = await ensureGenresLoaded();
 
     let selectedGenres = [];
 
@@ -81,42 +156,6 @@ export async function initGenreSelector({
         dropdown.classList.remove("hidden");
 
     }
-
-    //--------------------------------------------------
-    // Load Firestore
-    //--------------------------------------------------
-
-    async function loadGenres() {
-
-        genres = [];
-
-        const snapshot =
-            await getDocs(
-                collection(db, "genres")
-            );
-
-        snapshot.forEach(docSnap => {
-
-            const data = docSnap.data();
-
-            if (
-                data.name &&
-                !genres.some(g => g.name === data.name)
-            ) {
-
-                genres.push({
-                    id: docSnap.id,
-                    name: data.name,
-                    usageCount: data.usageCount || 0
-                });
-
-            }
-
-        });
-
-    }
-
-    await loadGenres();
 
     //--------------------------------------------------
     // Helpers: sort / popular
@@ -238,6 +277,8 @@ export async function initGenreSelector({
 
         hideDropdown();
 
+        notifyGenresChanged({ type: "create" });
+
     }
 
     async function renameGenreInProducts(oldName, newName) {
@@ -341,6 +382,8 @@ export async function initGenreSelector({
 
         renderDropdown(input.value);
 
+        notifyGenresChanged({ type: "rename", oldName, newName: trimmed });
+
     }
 
     async function removeGenre(genreObj) {
@@ -358,7 +401,9 @@ export async function initGenreSelector({
 
         await removeGenreFromProducts(genreObj.name);
 
-        genres = genres.filter(g => g.id !== genreObj.id);
+        const idx = genres.findIndex(g => g.id === genreObj.id);
+
+        if (idx !== -1) genres.splice(idx, 1);
 
         selectedGenres =
             selectedGenres.filter(n => n !== genreObj.name);
@@ -366,6 +411,8 @@ export async function initGenreSelector({
         renderSelected();
 
         renderDropdown(input.value);
+
+        notifyGenresChanged({ type: "delete", name: genreObj.name });
 
     }
 
@@ -398,7 +445,7 @@ export async function initGenreSelector({
         const name =
             document.createElement("span");
 
-        name.className = "cursor-pointer flex-1 text-gray-700 truncate";
+        name.className = "cursor-pointer flex-1 truncate";
 
         name.textContent = genreObj.name;
 
@@ -649,6 +696,38 @@ export async function initGenreSelector({
     }
 
     //--------------------------------------------------
+    // Đồng bộ với các selector khác trên trang
+    //--------------------------------------------------
+
+    function handleGenresChanged(event) {
+
+        if (event?.type === "rename") {
+
+            selectedGenres =
+                selectedGenres.map(
+                    n => (n === event.oldName ? event.newName : n)
+                );
+
+        } else if (event?.type === "delete") {
+
+            selectedGenres =
+                selectedGenres.filter(n => n !== event.name);
+
+        }
+
+        renderSelected();
+
+        if (!dropdown.classList.contains("hidden")) {
+
+            renderDropdown(input.value);
+
+        }
+
+    }
+
+    genreListeners.add(handleGenresChanged);
+
+    //--------------------------------------------------
     // Click outside
     //--------------------------------------------------
 
@@ -736,12 +815,25 @@ export async function initGenreSelector({
 
                 if (!g) continue;
 
-                await updateDoc(
-                    doc(db, "genres", g.id),
-                    { usageCount: increment(1) }
-                );
+                try {
 
-                g.usageCount += 1;
+                    await updateDoc(
+                        doc(db, "genres", g.id),
+                        { usageCount: increment(1) }
+                    );
+
+                    g.usageCount += 1;
+
+                } catch (err) {
+
+                    // Thể loại có thể đã bị xoá ở nơi khác — bỏ qua,
+                    // không để lỗi này làm hỏng việc lưu sản phẩm.
+                    console.warn(
+                        `Không thể cập nhật usageCount cho "${name}":`,
+                        err
+                    );
+
+                }
 
             }
 
@@ -751,12 +843,23 @@ export async function initGenreSelector({
 
                 if (!g) continue;
 
-                await updateDoc(
-                    doc(db, "genres", g.id),
-                    { usageCount: increment(-1) }
-                );
+                try {
 
-                g.usageCount = Math.max(0, g.usageCount - 1);
+                    await updateDoc(
+                        doc(db, "genres", g.id),
+                        { usageCount: increment(-1) }
+                    );
+
+                    g.usageCount = Math.max(0, g.usageCount - 1);
+
+                } catch (err) {
+
+                    console.warn(
+                        `Không thể cập nhật usageCount cho "${name}":`,
+                        err
+                    );
+
+                }
 
             }
 
