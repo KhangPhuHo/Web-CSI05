@@ -14,9 +14,10 @@ def load_products_json(file_path: str):
     Doc file products.json (dang dict: { product_id: { name, author, summary, ... } })
     va chuyen moi san pham thanh 1 Document.
 
-    - page_content: lay tu truong 'summary' (noi dung se duoc chunk + embed de tim kiem)
+    - page_content: lay tu truong 'summary', gop them 'visual_description'
+      (mo ta anh bia, neu co) de tim kiem tu hinh anh chinh xac hon
     - metadata: giu lai name, author, genres, price... de khong bi mat
-      thong tin khi 'summary' bi cat nho thanh nhieu chunk. Langchain se
+      thong tin khi noi dung bi cat nho thanh nhieu chunk. Langchain se
       tu dong copy metadata nay sang cho tung chunk con.
     """
 
@@ -32,6 +33,16 @@ def load_products_json(file_path: str):
         # Bo qua san pham khong co noi dung de tim kiem
         if not summary:
             continue
+
+        # Neu da chay step0_enrich_covers.py, san pham co the co them
+        # "visual_description" (mo ta boi canh/cam xuc tu anh bia, do Gemini
+        # Vision tao ra). Gop vao page_content de gop phan "hoc" cung summary,
+        # giup goi y tu hinh anh (step5) match chinh xac hon.
+        visual_description = (product.get("visual_description") or "").strip()
+
+        content = summary
+        if visual_description:
+            content = f"{summary}\n\nBối cảnh/cảm xúc từ ảnh bìa: {visual_description}"
 
         genres = product.get("genres", [])
 
@@ -49,7 +60,7 @@ def load_products_json(file_path: str):
         }
 
         documents.append(
-            Document(page_content=summary, metadata=metadata)
+            Document(page_content=content, metadata=metadata)
         )
 
     print(f"Doc thanh cong: {len(documents)} san pham tu file '{file_path}'")
@@ -103,7 +114,7 @@ if __name__ == "__main__":
     print("BUOC 1: DOC VA CHIA NHO VAN BAN")
     print("=" * 50)
 
-    docs = doc_load("data/products.json")
+    docs = doc_load("data/text/products.json")
     chunks = split_documents(docs)
 
     print(f"\nTong ket:")

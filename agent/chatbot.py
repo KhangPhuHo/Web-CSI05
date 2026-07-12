@@ -104,6 +104,15 @@ TRA LOI:"""
             if not summary:
                 continue
 
+            # Neu da chay step0_enrich_covers.py, san pham co the co them
+            # "visual_description" (mo ta tu anh bia). Gop vao content de
+            # goi y tu hinh anh (recommend_from_image) match chinh xac hon.
+            visual_description = (product.get("visual_description") or "").strip()
+
+            content = summary
+            if visual_description:
+                content = f"{summary}\n\nBối cảnh/cảm xúc từ ảnh bìa: {visual_description}"
+
             genres = product.get("genres", [])
 
             metadata = {
@@ -118,7 +127,7 @@ TRA LOI:"""
                 "source": file_path,
             }
 
-            documents.append(Document(page_content=summary, metadata=metadata))
+            documents.append(Document(page_content=content, metadata=metadata))
 
         print(f"Doc thanh cong: {len(documents)} san pham tu file '{file_path}'")
         return documents
@@ -322,7 +331,7 @@ if __name__ == "__main__":
     print("=" * 55)
 
     bot = RAGChatbot()
-    bot.load_documents("data/products.json")
+    bot.load_documents("data/text/products.json")
 
     print("\nChatbot san sang! Go 'quit' de thoat.\n")
 

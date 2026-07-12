@@ -1,5 +1,5 @@
 # Buoc 5: Doc anh bang Gemini Vision, chuyen thanh mo ta van ban,
-# roi tai su dung NGUYEN VEN pipeline RAG da co (step3_retrieve.py + step4_generate2.py)
+# roi tai su dung NGUYEN VEN pipeline RAG da co (step3_retrieve.py + step4_generate.py)
 #
 # Luong hoat dong:
 #   Anh (bytes) -> Gemini Vision -> mo ta bang text -> dung mo ta do lam "cau hoi"
@@ -82,14 +82,14 @@ def recommend_from_image(image_bytes: bytes, vector_store, chain, vision_model=N
     """
 
     from step3_retrieve import search_relevant_chunks, format_context, load_live_products
-    from step4_generate2 import answer_question
+    from step4_generate import answer_question
 
     if vision_model is None:
         vision_model = create_vision_model()
 
     description = describe_image(vision_model, image_bytes, mime_type)
 
-    live_products = load_live_products("data/products.json")
+    live_products = load_live_products("data/text/products.json")
 
     results = search_relevant_chunks(vector_store, description, top_k=top_k)
     context = format_context(results, live_products)
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print("=" * 50)
 
     from step2_embed_store import create_embedding_model, load_vector_store
-    from step4_generate2 import create_llm, create_qa_chain
+    from step4_generate import create_llm, create_qa_chain
 
     print("\nChuan bi he thong...")
     embedding_model = create_embedding_model()

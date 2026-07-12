@@ -36,7 +36,7 @@ app.use(cors({
     //"https://shapespeaker-dh3kestrb-grr20091s-projects.vercel.app"
     "https://web-csi-05.vercel.app"
   ],
-  methods: ["GET", "POST", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 }));
 

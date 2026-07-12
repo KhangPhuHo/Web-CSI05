@@ -54,9 +54,9 @@ with st.sidebar:
                     st.session_state.chatbot = RAGChatbot()
 
                 if doc_source == "Dung file mau co san":
-                    file_path = "data/products.json"
+                    file_path = "data/text/products.json"
                     if not os.path.exists(file_path):
-                        st.error("Khong tim thay data/products.json")
+                        st.error("Khong tim thay data/text/products.json")
                         st.stop()
                     st.session_state.chatbot.load_documents(file_path)
                 else:

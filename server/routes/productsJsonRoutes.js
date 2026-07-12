@@ -25,4 +25,10 @@ router.delete(
     controller.deleteProductJson
 );
 
+// Cap nhat rieng visual_description (goi tu step0_enrich_covers.py)
+router.patch(
+    "/products-json/:id",
+    controller.updateVisualDescription
+);
+
 module.exports = router;
