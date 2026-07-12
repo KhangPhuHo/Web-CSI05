@@ -21,9 +21,11 @@ def create_vision_model():
     if not api_key:
         raise ValueError("Khong tim thay GOOGLE_API_KEY trong file .env!")
 
-    # gemini-2.0-flash-lite: mien phi, ho tro doc anh (multimodal)
+    # gemini-flash-lite-latest: alias TU DONG CAP NHAT sang ban flash-lite moi nhat con ton tai
+    # (khong ghim cung ten model cu the - Google thuong xuyen "khai tu" cac model doi cu,
+    # VD gemini-2.0-flash-lite da bi ngung hoan toan tu 1/6/2026, dung alias tranh loi nay lap lai)
     vision_model = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-lite",
+        model="gemini-flash-lite-latest",
         google_api_key=api_key,
         temperature=0.2
     )

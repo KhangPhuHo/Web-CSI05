@@ -37,9 +37,12 @@ class RAGChatbot:
             temperature=0.1
         )
 
-        # Model rieng cho Gemini Vision (doc hinh anh) - mien phi
+        # Model rieng cho Gemini Vision (doc hinh anh)
+        # Dung alias "-latest" (tu dong tro sang ban flash-lite moi nhat con ton tai)
+        # thay vi ghim ten model cu the - tranh loi khi Google khai tu model doi cu
+        # (VD gemini-2.0-flash-lite da bi ngung hoan toan tu 1/6/2026)
         self.vision_model = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash-lite",
+            model="gemini-flash-lite-latest",
             google_api_key=api_key,
             temperature=0.2
         )
