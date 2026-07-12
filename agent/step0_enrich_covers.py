@@ -8,6 +8,7 @@
 import os
 import json
 import glob
+import time
 import requests
 from dotenv import load_dotenv
 load_dotenv()
@@ -80,8 +81,30 @@ def save_products_json(data: dict, path: str = PRODUCTS_JSON_PATH):
     os.replace(tmp_path, path)
 
 
+def wake_up_render(api_base_url: str = RENDER_API_BASE_URL, timeout: int = 60) -> None:
+    """
+    Render free tier se "ngu" (sleep) sau 1 thoi gian khong co request, va lan
+    goi dau tien can 30-50s de "danh thuc" server day len. Neu de vay, lan
+    PATCH dau tien trong vong lap se rat de bi timeout.
+
+    Ham nay goi 1 request "danh thuc" TRUOC khi bat dau vong lap chinh, voi
+    timeout du dai (60s) va bo qua moi loi (chi can server tinh day len la du,
+    khong quan tam response tra ve gi).
+    """
+    print("Dang danh thuc server tren Render (co the mat 30-50s neu dang ngu)...")
+
+    try:
+        requests.get(api_base_url, timeout=timeout)
+        print("Server tren Render da san sang.")
+
+    except requests.exceptions.RequestException as e:
+        print(f"   Canh bao: khong the danh thuc server truoc: {e}")
+        print("   (Van tiep tuc chay - lan PATCH dau tien co the phai tu retry)")
+
+
 def push_visual_description_to_render(product_id: str, description: str,
-                                       api_base_url: str = RENDER_API_BASE_URL) -> bool:
+                                       api_base_url: str = RENDER_API_BASE_URL,
+                                       max_retries: int = 3) -> bool:
     """
     Day mo ta vua tao len ban products.json dang luu tren Render, qua API
     PATCH /api/products-json/:id cua backend Node (xem productsJsonController.js).
@@ -89,21 +112,33 @@ def push_visual_description_to_render(product_id: str, description: str,
     Chi cap nhat DUY NHAT field visual_description, khong dam vao cac field
     khac (name/summary/price/stock...) cua san pham tren Render.
 
-    Tra ve True/False de biet co day thanh cong khong - loi o day KHONG lam
-    hong ban local (ban local da luu roi truoc khi goi ham nay).
+    Tu dong thu lai (retry) toi da `max_retries` lan neu gap loi mang/timeout -
+    Render free tier hay bi "ngu" nen lan goi dau co the cham, cac lan sau
+    thi nhanh. Tra ve True/False de biet co day thanh cong khong - loi o day
+    KHONG lam hong ban local (ban local da luu roi truoc khi goi ham nay).
     """
-    try:
-        response = requests.patch(
-            f"{api_base_url}/api/products-json/{product_id}",
-            json={"visual_description": description},
-            timeout=15
-        )
-        response.raise_for_status()
-        return True
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.patch(
+                f"{api_base_url}/api/products-json/{product_id}",
+                json={"visual_description": description},
+                timeout=60  # du dai de chiu duoc Render "thuc day" lan dau
+            )
+            response.raise_for_status()
+            return True
 
-    except requests.exceptions.RequestException as e:
-        print(f"   Canh bao: khong the day len Render cho '{product_id}': {e}")
-        return False
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries:
+                wait_seconds = 5 * attempt
+                print(f"   Loi lan {attempt}/{max_retries} khi day len Render "
+                      f"cho '{product_id}': {e} - thu lai sau {wait_seconds}s...")
+                time.sleep(wait_seconds)
+            else:
+                print(f"   Canh bao: khong the day len Render cho '{product_id}' "
+                      f"sau {max_retries} lan thu: {e}")
+                return False
+
+    return False
 
 
 def enrich_covers(json_path: str = PRODUCTS_JSON_PATH, img_dir: str = IMG_DIR,
@@ -113,17 +148,28 @@ def enrich_covers(json_path: str = PRODUCTS_JSON_PATH, img_dir: str = IMG_DIR,
 
     vision_model = create_vision_model()
 
+    if push_to_render:
+        wake_up_render()
+
     enriched_count = 0
     skipped_count = 0
     missing_image_count = 0
     pushed_count = 0
-    push_failed_count = 0
+    failed_product_ids = []  # gom lai de thu day lai o cuoi, ke ca sach da co san local
 
     for product_id, product in products.items():
 
         # Da co mo ta roi -> bo qua, khong goi lai Vision (tiet kiem API, giu nguyen mo ta cu)
         if product.get("visual_description"):
             skipped_count += 1
+
+            # QUAN TRONG: sach nay co the tung bi loi khi day len Render o lan
+            # chay truoc (VD do Render dang ngu / timeout) - du DA CO mo ta local,
+            # ban tren Render van co the dang thieu field nay. Gom vao danh sach
+            # se thu day lai o cuoi, de dam bao 2 ban luon dong bo that su.
+            if push_to_render:
+                failed_product_ids.append((product_id, product["visual_description"]))
+
             continue
 
         cover_paths = get_cover_images(product_id, img_dir)
@@ -157,7 +203,31 @@ def enrich_covers(json_path: str = PRODUCTS_JSON_PATH, img_dir: str = IMG_DIR,
                 pushed_count += 1
                 print(f"   Da day len Render thanh cong")
             else:
-                push_failed_count += 1
+                failed_product_ids.append((product_id, description))
+
+    # Thu day lai TAT CA nhung sach chua chac chan da co tren Render:
+    # gom ca sach vua tao moi bi loi, LAN sach da co san local (de phong lan
+    # truoc bi timeout giua chung). PATCH la thao tac idempotent (ghi de field
+    # visual_description) nen day lai nhieu lan khong gay hai gi.
+    push_failed_count = 0
+
+    if push_to_render and failed_product_ids:
+        print(f"\nDang thu dong bo lai {len(failed_product_ids)} san pham len Render...")
+
+        still_failed = []
+
+        for product_id, description in failed_product_ids:
+            if push_visual_description_to_render(product_id, description):
+                pushed_count += 1
+            else:
+                still_failed.append(product_id)
+
+        push_failed_count = len(still_failed)
+
+        if still_failed:
+            print(f"   Van con {push_failed_count} san pham chua dong bo duoc: {still_failed}")
+            print(f"   -> Chay lai script nay (co the can vai phut) de thu tiep,")
+            print(f"      hoac kiem tra lai server Render co dang hoat dong binh thuong khong.")
 
     print(f"\nHoan thanh!")
     print(f"   - Da tao mo ta moi:    {enriched_count}")

@@ -34,6 +34,32 @@ def create_vision_model():
     return vision_model
 
 
+def _extract_text(content) -> str:
+    """
+    response.content cua AIMessage co the la:
+      - 1 chuoi string don gian (cac phien ban cu)
+      - 1 list cac "content block", VD [{"type": "text", "text": "..."}] (cac phien ban
+        langchain-google-genai moi hon, dac biet khi model ho tro "thinking")
+
+    Ham nay xu ly duoc ca 2 truong hop, luon tra ve 1 chuoi string sach.
+    """
+    if isinstance(content, str):
+        return content.strip()
+
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                text = item.get("text", "")
+                if text:
+                    parts.append(text)
+        return "".join(parts).strip()
+
+    return str(content).strip()
+
+
 def describe_image(vision_model, image_bytes: bytes, mime_type: str = "image/jpeg") -> str:
     """
     Nhan bytes cua 1 tam anh, tra ve 1 doan mo ta bang tieng Viet:
@@ -68,7 +94,10 @@ def describe_image(vision_model, image_bytes: bytes, mime_type: str = "image/jpe
     print("Gemini Vision dang doc anh...")
 
     response = vision_model.invoke([message])
-    description = response.content.strip()
+    description = _extract_text(response.content)
+
+    if not description:
+        raise ValueError("Gemini Vision khong tra ve noi dung mo ta (content rong).")
 
     print(f"Mo ta anh: '{description[:200]}...'")
 

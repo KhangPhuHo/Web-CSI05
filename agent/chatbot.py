@@ -300,7 +300,35 @@ TRA LOI:"""
         )
 
         response = self.vision_model.invoke([message])
-        return response.content.strip()
+        description = self._extract_text(response.content)
+
+        if not description:
+            raise ValueError("Gemini Vision khong tra ve noi dung mo ta (content rong).")
+
+        return description
+
+    @staticmethod
+    def _extract_text(content) -> str:
+        """
+        response.content cua AIMessage co the la 1 chuoi string, hoac 1 list
+        cac "content block" (VD [{"type": "text", "text": "..."}]) tuy phien ban
+        langchain-google-genai. Ham nay xu ly duoc ca 2 truong hop.
+        """
+        if isinstance(content, str):
+            return content.strip()
+
+        if isinstance(content, list):
+            parts = []
+            for item in content:
+                if isinstance(item, str):
+                    parts.append(item)
+                elif isinstance(item, dict):
+                    text = item.get("text", "")
+                    if text:
+                        parts.append(text)
+            return "".join(parts).strip()
+
+        return str(content).strip()
 
     def recommend_from_image(self, image_bytes: bytes, mime_type: str = "image/jpeg", top_k: int = 3) -> dict:
         """Nhan bytes cua 1 tam anh, tra ve goi y sach.
