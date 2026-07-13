@@ -101,18 +101,72 @@ function toggleChatbot() {
   }
 }
 
+// Escape ky tu HTML dac biet - tranh nguoi dung go </div>, <script>... bi
+// chen thang vao trang (XSS), va la buoc bat buoc TRUOC KHI ap dung markdown ben duoi
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// Chuyen markdown CO BAN (**in dam**, gach dau dong bang "* " hoac "- ",
+// xuong dong) ma Gemini hay tra ve, thanh HTML that su de hien thi dep hon.
+// Khong dung thu vien ngoai - chi can du cho cac dinh dang Gemini thuong tra ve.
+function formatBotMessage(text) {
+  let safe = escapeHtml(text);
+
+  // **chu dam** -> <strong>chu dam</strong>
+  safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  const lines = safe.split(/\r?\n/);
+  let html = '';
+  let inList = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (line.startsWith('* ') || line.startsWith('- ')) {
+      if (!inList) {
+        html += '<ul style="margin:6px 0; padding-left:20px;">';
+        inList = true;
+      }
+      html += `<li>${line.slice(2)}</li>`;
+      continue;
+    }
+
+    if (inList) {
+      html += '</ul>';
+      inList = false;
+    }
+
+    if (line) {
+      html += `<p style="margin:4px 0;">${line}</p>`;
+    }
+  }
+
+  if (inList) html += '</ul>';
+
+  return html;
+}
+
 function addMessage(sender, message, side) {
   const chatBody = document.getElementById('chat-body');
   const msg = document.createElement('div');
   msg.className = `message ${side}`;
+
   if (side === 'left') {
+    // Tin nhan cua bot: parse markdown (in dam, gach dau dong, xuong dong)
     msg.innerHTML = `
       <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="Bot" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:8px;">
-      <strong>${sender}:</strong> ${message}
+      <strong>${sender}:</strong>
+      <div style="margin-top:4px;">${formatBotMessage(message)}</div>
     `;
   } else {
-    msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    // Tin nhan cua nguoi dung: chi escape HTML, khong can parse markdown
+    msg.innerHTML = `<strong>${sender}:</strong> ${escapeHtml(message)}`;
   }
+
   chatBody.appendChild(msg);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
