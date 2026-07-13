@@ -25,11 +25,9 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 let chatbotBox, popupNotification, popupTimeout;
+let isTTSEnabled = true; // Trạng thái bật TTS mặc định
 
 const accessToken = 'VFDGRWWK4PW7ITLLUJZJBEX7VMKKPQNN'; // Thay token thật vào đây
-
-// Backend Node - noi proxy sang RAG chatbot (Python), xem controllers/ragController.js
-const NODE_API_BASE_URL = 'https://bookstore-bsjx.onrender.com';
 
 document.addEventListener("DOMContentLoaded", () => {
   createSummonButton();
@@ -58,9 +56,8 @@ function createChatbot() {
     <div id="chat-body"></div>
     <div id="chat-input">
       <input type="text" id="user-input" placeholder="Nhập câu hỏi..." autocomplete="off" />
-      <input type="file" id="image-input" accept="image/*" hidden />
-      <button id="add-image-btn" title="Gửi hình ảnh">
-        <i class="fa fa-image" aria-hidden="true"></i>
+      <button id="ctr-bot-speech" title="Bật/Tắt giọng nói">
+        <i class="fa fa-volume-up" aria-hidden="true"></i>
       </button>
       <button id="send-btn">Gửi</button>
     </div>
@@ -70,13 +67,13 @@ function createChatbot() {
   document.getElementById('close-btn').onclick = toggleChatbot;
   document.getElementById('send-btn').onclick = sendMessage;
 
-  // Nut them hinh anh: bam vao se mo hop thoai chon file (input file dang bi an)
-  document.getElementById('add-image-btn').onclick = () => {
-    document.getElementById('image-input').click();
+  // Bật/tắt TTS khi click vào nút ctr-bot-speech
+  document.getElementById('ctr-bot-speech').onclick = () => {
+    isTTSEnabled = !isTTSEnabled;
+    document.getElementById('ctr-bot-speech').innerHTML = isTTSEnabled
+      ? '<i class="fa fa-volume-up" aria-hidden="true"></i>'
+      : '<i class="fa fa-volume-off" aria-hidden="true"></i>';
   };
-
-  // Khi nguoi dung da chon 1 anh
-  document.getElementById('image-input').addEventListener('change', handleImageSelected);
 
   // Gửi tin nhắn khi nhấn Enter
   document.getElementById('user-input').addEventListener('keypress', function (e) {
@@ -101,6 +98,50 @@ function toggleChatbot() {
   }
 }
 
+//API gọi FPTAI
+async function speakFPT(text) {
+  const apiKey = '2gwFyWnUk3EJnr7siR7wOyGDmrOAt3co';
+  const url = 'https://api.fpt.ai/hmi/tts/v5';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: text,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Lỗi khi gọi API TTS: ' + response.status);
+  }
+
+  const data = await response.json();
+  console.log('FPT TTS response:', data);
+
+  if (data.error !== 0) {
+    throw new Error('API trả về lỗi: ' + data.message);
+  }
+
+  if (data.async) {
+    // URL file audio async
+    const audioUrl = data.async;
+    // Đợi 3 giây rồi phát audio
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const audio = new Audio(audioUrl);
+    await audio.play();
+  } else if (data.data) {
+    // Nếu có base64 trả thẳng
+    const audioSrc = 'data:audio/mp3;base64,' + data.data;
+    const audio = new Audio(audioSrc);
+    await audio.play();
+  } else {
+    throw new Error('Không có dữ liệu âm thanh trả về');
+  }
+}
+
 function addMessage(sender, message, side) {
   const chatBody = document.getElementById('chat-body');
   const msg = document.createElement('div');
@@ -115,84 +156,6 @@ function addMessage(sender, message, side) {
   }
   chatBody.appendChild(msg);
   chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-// Hien thi 1 tam anh trong khung chat (dung ObjectURL - chi hien thi tam thoi
-// trong trinh duyet, khong can doi upload xong moi hien)
-function addImageMessage(sender, file, side) {
-  const chatBody = document.getElementById('chat-body');
-  const msg = document.createElement('div');
-  msg.className = `message ${side}`;
-
-  const imgUrl = URL.createObjectURL(file);
-  const imgTag = `<img src="${imgUrl}" alt="Hình ảnh" style="max-width:150px; max-height:150px; border-radius:8px; margin-top:4px; display:block;">`;
-
-  if (side === 'left') {
-    msg.innerHTML = `
-      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="Bot" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:8px;">
-      <strong>${sender}:</strong>
-      ${imgTag}
-    `;
-  } else {
-    msg.innerHTML = `<strong>${sender}:</strong>${imgTag}`;
-  }
-
-  chatBody.appendChild(msg);
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-// Nguoi dung vua chon 1 file anh tu nut "Gui hinh anh"
-async function handleImageSelected(event) {
-  const file = event.target.files[0];
-  event.target.value = ""; // reset de chon lai chinh file nay van kich hoat duoc 'change'
-
-  if (!file) return;
-
-  // Chap nhan HAU HET dinh dang anh pho bien (jpg, png, webp, gif, bmp, svg...)
-  // - dua vao MIME type do trinh duyet tu nhan dien, khong gioi han cung 1 danh sach
-  if (!file.type.startsWith('image/')) {
-    showToast("❌ File này không phải hình ảnh. Vui lòng chọn 1 tệp ảnh (JPG, PNG, WEBP, GIF...).", "error");
-    return;
-  }
-
-  addImageMessage('Bạn', file, 'right');
-
-  const chatBody = document.getElementById('chat-body');
-  const loadingMsg = document.createElement('div');
-  loadingMsg.className = 'message left typing-indicator';
-  loadingMsg.textContent = 'Đang xử lý ảnh...';
-  chatBody.appendChild(loadingMsg);
-  chatBody.scrollTop = chatBody.scrollHeight;
-
-  try {
-    const result = await recommendFromImageRag(file);
-    loadingMsg.remove();
-    addMessage('Chatbot', result.answer, 'left');
-  } catch (error) {
-    loadingMsg.remove();
-    console.error('Lỗi khi xử lý ảnh:', error);
-    addMessage('Chatbot', 'Xin lỗi, mình chưa xử lý được ảnh này. Vui lòng thử lại.', 'left');
-  }
-}
-
-// Gui anh sang backend Node -> Node proxy tiep sang RAG server (Gemini Vision)
-// Tra ve { answer, sources, image_description }
-async function recommendFromImageRag(file) {
-  const formData = new FormData();
-  formData.append('media', file);
-
-  const response = await fetch(`${NODE_API_BASE_URL}/api/recommend-from-image-rag`, {
-    method: 'POST',
-    body: formData
-  });
-
-  const data = await response.json();
-
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || 'Lỗi không xác định từ RAG server.');
-  }
-
-  return data;
 }
 
 async function processInput(text) {
@@ -328,30 +291,6 @@ async function handleCommand(input) {
   return "⚠ Lệnh không hợp lệ hoặc chưa hỗ trợ.";
 }
 
-// Gui cau hoi sang backend Node -> Node proxy tiep sang RAG server (Gemini)
-async function askRagChatbot(question) {
-  try {
-    const response = await fetch(`${NODE_API_BASE_URL}/api/ask-rag`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      console.error('Lỗi từ RAG chatbot:', data);
-      return 'Xin lỗi, mình chưa trả lời được câu này. Vui lòng thử lại sau.';
-    }
-
-    return data.answer;
-
-  } catch (error) {
-    console.error('Lỗi khi gọi RAG chatbot:', error);
-    return 'Xin lỗi, có lỗi khi kết nối tới hệ thống gợi ý sách.';
-  }
-}
-
 async function getWitResponse(input) {
   try {
     const res = await fetch(`https://api.wit.ai/message?v=20230616&q=${encodeURIComponent(input)}`, {
@@ -369,21 +308,18 @@ async function getWitResponse(input) {
     switch (intent) {
       case 'greeting':
         return 'Xin chào! Tôi có thể giúp gì cho bạn?';
+      case 'ask_product':
+        return 'Hiện tại chúng tôi có nhiều sản phẩm hấp dẫn, bạn quan tâm sản phẩm nào?';
+      case 'buy_product':
+        return 'Vậy bạn hãy chọn vào sản phẩm, sau đó chọn vào nút mua ngay hoặc giỏ hàng, thêm thông tin là được';
       case 'ask_features':
         return 'Tôi có chức năng trò chuyện, giải đáp các thắc mắc của bạn về sản phẩm và dịch vụ bên chúng tôi';
       case 'thank':
         return 'Cảm ơn bạn vì đã tin tưởng dịch vụ bên mình';
       case 'goodbye':
         return 'Cảm ơn bạn, hẹn gặp lại!';
-      case 'ask_product':
-      case 'buy_product':
-        // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
-        // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
-        return await askRagChatbot(input);
       default:
-        // Intent khong ro / Wit.ai chua nhan dien duoc -> van thu hoi RAG chatbot,
-        // vi rat co the day la cau hoi ve sach ma Wit.ai chua duoc train du
-        return await askRagChatbot(input);
+        return 'Tôi chưa hiểu rõ ý bạn, bạn có thể nói lại không?';
     }
   } catch (error) {
     console.error('Lỗi gọi Wit.ai:', error);
@@ -412,11 +348,21 @@ async function sendMessage() {
     const response = await processInput(text); // 👉 xử lý command hoặc gọi Wit.ai
     addMessage('Chatbot', response, 'left');
 
+    // 👉 ĐỌC TO CÂU TRẢ LỜI BẰNG FPTAI TTS
+    if (isTTSEnabled) {
+      try {
+        await speakFPT(response);
+      } catch (err) {
+        console.error("Lỗi khi phát âm thanh:", err);
+      }
+    }
+
     if (typeof chatbotBox !== 'undefined' && chatbotBox.style.display === 'none') {
       showPopup(response);
     }
   }, 1500);
 }
+//2gwFyWnUk3EJnr7siR7wOyGDmrOAt3co
 
 function showPopup(message) {
   hidePopup();

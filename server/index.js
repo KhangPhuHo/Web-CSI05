@@ -137,6 +137,10 @@ require("./routes/productsJsonRoutes");
 
 app.use("/api", productsJsonRoutes);
 
+// RAG chatbot (Gemini) - proxy sang Python API server rieng, xem controllers/ragController.js
+const ragRoutes = require("./routes/ragRoutes");
+app.use("/api", ragRoutes);
+
 // ✅ Khởi động server
 app.listen(PORT, () => {
   console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
