@@ -31,6 +31,42 @@ const accessToken = 'VFDGRWWK4PW7ITLLUJZJBEX7VMKKPQNN'; // Thay token thật và
 // Backend Node - noi proxy sang RAG chatbot (Python), xem controllers/ragController.js
 const NODE_API_BASE_URL = 'https://bookstore-bsjx.onrender.com';
 
+// Cau hinh cho viec tu dong "cho + hoi lai" khi RAG server dang khoi dong (503)
+const RAG_MAX_WAIT_MS = 6 * 60 * 1000;   // toi da 6 phut
+const RAG_POLL_INTERVAL_MS = 10 * 1000;  // moi 10 giay thu lai 1 lan
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Goi 1 ham fetch (tra ve Promise<Response>) NHIEU LAN cho toi khi response
+// khong con la 503 nua (server da san sang), hoac qua thoi gian cho toi da.
+// Dung chung cho ca hoi text (askRagChatbot) va goi y tu anh (recommendFromImageRag),
+// de nguoi dung khong phai tu bam gui lai moi khi RAG server dang "thuc day".
+async function fetchWithRagRetry(doFetch, onWaiting) {
+  const startTime = Date.now();
+  let hasNotified = false;
+
+  while (true) {
+    const response = await doFetch();
+
+    if (response.status !== 503) {
+      return response;
+    }
+
+    if (Date.now() - startTime > RAG_MAX_WAIT_MS) {
+      return response; // qua lau - tra ve 503 cuoi cung, de ham goi tu bao loi
+    }
+
+    if (!hasNotified) {
+      onWaiting();
+      hasNotified = true;
+    }
+
+    await sleep(RAG_POLL_INTERVAL_MS);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   createSummonButton();
   createChatbot();
@@ -235,10 +271,17 @@ async function recommendFromImageRag(file) {
   const formData = new FormData();
   formData.append('media', file);
 
-  const response = await fetch(`${NODE_API_BASE_URL}/api/recommend-from-image-rag`, {
-    method: 'POST',
-    body: formData
-  });
+  const response = await fetchWithRagRetry(
+    () => fetch(`${NODE_API_BASE_URL}/api/recommend-from-image-rag`, {
+      method: 'POST',
+      body: formData
+    }),
+    () => addMessage(
+      'Chatbot',
+      'Hệ thống đang khởi động (server vừa "ngủ dậy", có thể mất vài phút). Mình sẽ gợi ý ngay khi xong, bạn chờ chút nhé!',
+      'left'
+    )
+  );
 
   const data = await response.json();
 
@@ -385,21 +428,27 @@ async function handleCommand(input) {
 // Gui cau hoi sang backend Node -> Node proxy tiep sang RAG server (Gemini)
 async function askRagChatbot(question) {
   try {
-    const response = await fetch(`${NODE_API_BASE_URL}/api/ask-rag`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question })
-    });
+    const response = await fetchWithRagRetry(
+      () => fetch(`${NODE_API_BASE_URL}/api/ask-rag`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      }),
+      () => addMessage(
+        'Chatbot',
+        'Hệ thống gợi ý sách đang khởi động (server vừa "ngủ dậy", có thể mất vài phút). Mình sẽ tự trả lời ngay khi sẵn sàng, bạn chờ chút nhé!',
+        'left'
+      )
+    );
 
     const data = await response.json();
 
     if (!response.ok || !data.success) {
       console.error('Lỗi từ RAG chatbot:', data);
 
-      // 503 = server con dang khoi dong (cold start) - khac voi loi that,
-      // nen bao nguoi dung doi thay vi noi chung chung "khong tra loi duoc"
+      // Van con 503 sau khi da thu het thoi gian cho toi da
       if (response.status === 503) {
-        return 'Hệ thống gợi ý sách đang khởi động lại (thường mất 20-40 giây), bạn hỏi lại giúp mình sau ít phút nhé!';
+        return 'Xin lỗi, hệ thống khởi động hơi lâu. Bạn vui lòng hỏi lại giúp mình sau ít phút nhé!';
       }
 
       return 'Xin lỗi, mình chưa trả lời được câu này. Vui lòng thử lại sau.';
@@ -452,6 +501,23 @@ async function getWitResponse(input) {
   }
 }
 
+// Khoa/mo o nhap + nut gui (va nut anh) trong luc cho chatbot tra loi,
+// tranh nguoi dung bam gui lien tuc gay don cau hoi / nghen server
+function setInputLocked(locked) {
+  const input = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const imageBtn = document.getElementById('add-image-btn');
+
+  if (input) {
+    input.disabled = locked;
+    input.placeholder = locked ? 'Đang trả lời...' : 'Nhập câu hỏi...';
+  }
+  if (sendBtn) sendBtn.disabled = locked;
+  if (imageBtn) imageBtn.disabled = locked;
+
+  if (!locked && input) input.focus();
+}
+
 async function sendMessage() {
   const input = document.getElementById('user-input');
   const text = input.value.trim();
@@ -459,6 +525,8 @@ async function sendMessage() {
 
   addMessage('Bạn', text, 'right');
   input.value = '';
+
+  setInputLocked(true);
 
   const chatBody = document.getElementById('chat-body');
   const loadingMsg = document.createElement('div');
@@ -468,13 +536,19 @@ async function sendMessage() {
   chatBody.scrollTop = chatBody.scrollHeight;
 
   setTimeout(async () => {
-    loadingMsg.remove();
+    try {
+      const response = await processInput(text); // 👉 xử lý command hoặc gọi Wit.ai
+      addMessage('Chatbot', response, 'left');
 
-    const response = await processInput(text); // 👉 xử lý command hoặc gọi Wit.ai
-    addMessage('Chatbot', response, 'left');
-
-    if (typeof chatbotBox !== 'undefined' && chatbotBox.style.display === 'none') {
-      showPopup(response);
+      if (typeof chatbotBox !== 'undefined' && chatbotBox.style.display === 'none') {
+        showPopup(response);
+      }
+    } catch (error) {
+      console.error('Lỗi khi xử lý tin nhắn:', error);
+      addMessage('Chatbot', 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.', 'left');
+    } finally {
+      loadingMsg.remove();
+      setInputLocked(false);
     }
   }, 1500);
 }

@@ -134,6 +134,13 @@
   animation: blink 1s infinite;
 }
 
+#user-input:disabled,
+#send-btn:disabled,
+#add-image-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @keyframes blink {
 
   0%,
