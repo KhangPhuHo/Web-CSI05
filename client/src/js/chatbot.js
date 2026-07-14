@@ -395,6 +395,13 @@ async function askRagChatbot(question) {
 
     if (!response.ok || !data.success) {
       console.error('Lỗi từ RAG chatbot:', data);
+
+      // 503 = server con dang khoi dong (cold start) - khac voi loi that,
+      // nen bao nguoi dung doi thay vi noi chung chung "khong tra loi duoc"
+      if (response.status === 503) {
+        return 'Hệ thống gợi ý sách đang khởi động lại (thường mất 20-40 giây), bạn hỏi lại giúp mình sau ít phút nhé!';
+      }
+
       return 'Xin lỗi, mình chưa trả lời được câu này. Vui lòng thử lại sau.';
     }
 
