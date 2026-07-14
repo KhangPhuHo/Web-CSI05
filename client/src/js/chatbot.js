@@ -546,6 +546,12 @@ async function getWitResponse(input) {
       case 'goodbye':
         return 'Cảm ơn bạn, hẹn gặp lại!';
       case 'ask_product':
+      case 'products_by_category':
+      case 'get_price_of_product':
+      case 'check_stock':
+      case 'compare_price':
+      case 'top_rated_products':
+      case "product_detail":
       case 'buy_product':
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
