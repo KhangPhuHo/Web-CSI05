@@ -26,6 +26,15 @@ onAuthStateChanged(auth, async (user) => {
 
 let chatbotBox, popupNotification, popupTimeout;
 
+// Cac cau hoi goi y hien thi luc chatbot con trong (chua co tin nhan nao)
+// giup nguoi dung moi biet nen hoi gi. Co the tuy chinh lai cho phu hop
+// voi danh muc sach / dich vu thuc te cua shop.
+const SUGGESTED_QUESTIONS = [
+  'Sách bán chạy nhất tháng này?',
+  'Shop có sách kỹ năng sống không?',
+  'Làm sao để đặt hàng và thanh toán?'
+];
+
 const accessToken = 'VFDGRWWK4PW7ITLLUJZJBEX7VMKKPQNN'; // Thay token thật vào đây
 
 // Backend Node - noi proxy sang RAG chatbot (Python), xem controllers/ragController.js
@@ -120,6 +129,40 @@ function createChatbot() {
       sendMessage();
     }
   });
+
+  renderSuggestedQuestions();
+}
+
+// Hien 1 bong bong nho voi vai cau hoi goi y ngay khi chatbot con trong,
+// bam vao 1 goi y se tu dien vao o input va gui luon (khong can go tay).
+// Bong bong nay se tu an di ngay khi nguoi dung gui cau hoi dau tien.
+function renderSuggestedQuestions() {
+  const chatBody = document.getElementById('chat-body');
+  if (!chatBody || SUGGESTED_QUESTIONS.length === 0) return;
+
+  const box = document.createElement('div');
+  box.id = 'suggested-questions';
+  box.innerHTML = `
+    <div style="margin:4px 0 6px; font-size:13px; color:#666;">Bạn có thể hỏi:</div>
+    ${SUGGESTED_QUESTIONS.map(q => `<button class="suggestion-chip" type="button">${escapeHtml(q)}</button>`).join('')}
+  `;
+
+  box.querySelectorAll('.suggestion-chip').forEach((btn, idx) => {
+    btn.onclick = () => {
+      const input = document.getElementById('user-input');
+      if (!input || input.disabled) return;
+      input.value = SUGGESTED_QUESTIONS[idx];
+      sendMessage();
+    };
+  });
+
+  chatBody.appendChild(box);
+}
+
+// Go bong bong goi y (goi luc nguoi dung bat dau tu go/gui cau hoi thuc su)
+function removeSuggestedQuestions() {
+  const box = document.getElementById('suggested-questions');
+  if (box) box.remove();
 }
 
 function toggleChatbot() {
@@ -486,6 +529,12 @@ async function getWitResponse(input) {
       case 'goodbye':
         return 'Cảm ơn bạn, hẹn gặp lại!';
       case 'ask_product':
+      case 'products_by_category':
+      case 'get_price_of_product':
+      case 'check_stock':
+      case 'compare_price':
+      case 'top_rated_products':
+      case "product_detail":
       case 'buy_product':
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
@@ -522,6 +571,8 @@ async function sendMessage() {
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (text === '') return;
+
+  removeSuggestedQuestions();
 
   addMessage('Bạn', text, 'right');
   input.value = '';

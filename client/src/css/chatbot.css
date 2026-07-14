@@ -134,6 +134,26 @@
   animation: blink 1s infinite;
 }
 
+#suggested-questions {
+  padding: 4px 2px;
+}
+
+.suggestion-chip {
+  display: inline-block;
+  margin: 4px 4px 0 0;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #f5f5f5;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.suggestion-chip:hover {
+  background: #e8e8e8;
+}
+
 #user-input:disabled,
 #send-btn:disabled,
 #add-image-btn:disabled {
