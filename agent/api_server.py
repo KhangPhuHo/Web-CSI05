@@ -97,9 +97,18 @@ def ensure_bot_ready():
 # POST /ask - hoi dap bang TEXT
 # ------------------------------------------------------------------
 
+class HistoryTurn(BaseModel):
+    role: str      # "user" hoac "assistant"
+    content: str
+
+
 class AskRequest(BaseModel):
     question: str
     top_k: int = 3
+    # Vai luot hoi-dap gan nhat, dung de RAGChatbot viet lai cau hoi hien tai
+    # cho "doc lap" (khong con phu thuoc dai tu nhu "no", "cai do") truoc khi
+    # tim kiem FAISS. Mac dinh rong neu client khong gui (VD lan hoi dau tien).
+    history: List[HistoryTurn] = []
 
 
 class AskResponse(BaseModel):
@@ -114,7 +123,9 @@ async def ask(payload: AskRequest):
     if not payload.question or not payload.question.strip():
         raise HTTPException(status_code=400, detail="Truong 'question' khong duoc de trong.")
 
-    result = bot.ask(payload.question, top_k=payload.top_k)
+    history_as_dicts = [turn.dict() for turn in payload.history]
+
+    result = bot.ask(payload.question, top_k=payload.top_k, history=history_as_dicts)
     return result
 
 

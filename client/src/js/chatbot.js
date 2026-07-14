@@ -46,6 +46,12 @@ const NODE_API_BASE_URL = 'https://bookstore-bsjx.onrender.com';
 const RAG_MAX_WAIT_MS = 6 * 60 * 1000;   // toi da 6 phut
 const RAG_POLL_INTERVAL_MS = 10 * 1000;  // moi 10 giay thu lai 1 lan
 
+// Luu lai vai luot hoi-dap gan nhat (RAM, mat khi tai lai trang) de gui kem
+// sang RAG server -> server dung LLM "viet lai cau hoi cho doc lap" truoc khi
+// tim FAISS. Nho vay "no con ban bao nhieu" van hieu duoc "no" la sach gi.
+let conversationHistory = [];
+const MAX_HISTORY_TURNS = 6; // 6 dong = 3 cap hoi-dap gan nhat
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -477,7 +483,9 @@ async function askRagChatbot(question) {
       () => fetch(`${NODE_API_BASE_URL}/api/ask-rag`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question })
+        // Gui kem lich su hoi-dap gan nhat (KHONG bao gom cau hoi hien tai) de
+        // server viet lai cau hoi cho doc lap truoc khi tim FAISS
+        body: JSON.stringify({ question, history: conversationHistory })
       }),
       () => addMessage(
         'Chatbot',
@@ -497,6 +505,14 @@ async function askRagChatbot(question) {
       }
 
       return 'Xin lỗi, mình chưa trả lời được câu này. Vui lòng thử lại sau.';
+    }
+
+    // Cap nhat lich su hoi thoai: them luot nay vao cuoi, chi giu MAX_HISTORY_TURNS
+    // dong gan nhat (cat bot dong cu de payload gui di khong phinh to dan)
+    conversationHistory.push({ role: 'user', content: question });
+    conversationHistory.push({ role: 'assistant', content: data.answer });
+    if (conversationHistory.length > MAX_HISTORY_TURNS) {
+      conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS);
     }
 
     return data.answer;
@@ -530,12 +546,6 @@ async function getWitResponse(input) {
       case 'goodbye':
         return 'Cảm ơn bạn, hẹn gặp lại!';
       case 'ask_product':
-      case 'products_by_category':
-      case 'get_price_of_product':
-      case 'check_stock':
-      case 'compare_price':
-      case 'top_rated_products':
-      case "product_detail":
       case 'buy_product':
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that

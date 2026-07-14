@@ -24,7 +24,7 @@ exports.askRag = async (req, res) => {
 
     if (!ensureRagConfigured(res)) return;
 
-    const { question, top_k } = req.body;
+    const { question, top_k, history } = req.body;
 
     if (!question || !question.trim()) {
         return res.status(400).json({
@@ -42,7 +42,11 @@ exports.askRag = async (req, res) => {
             },
             body: JSON.stringify({
                 question,
-                top_k: top_k || 3
+                top_k: top_k || 3,
+                // Lich su hoi-dap gan nhat (mang [{role, content}]) - client gui
+                // len de server viet lai cau hoi cho doc lap truoc khi tim FAISS.
+                // Neu client cu chua gui field nay thi mac dinh mang rong.
+                history: Array.isArray(history) ? history : []
             })
         });
 

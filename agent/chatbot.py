@@ -4,6 +4,7 @@
 import os
 import json
 import base64
+from typing import List, Optional, Dict
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -77,6 +78,35 @@ TRA LOI:"""
         # Pipe operator |: ket noi cac buoc xu ly theo thu tu
         # prompt -> llm -> StrOutputParser (lay chuoi text thuan tu AIMessage)
         self.chain = self.prompt | self.llm | StrOutputParser()
+
+        # ------------------------------------------------------------------
+        # Prompt viet lai cau hoi cho "doc lap" dua vao lich su hoi thoai gan
+        # nhat. VD: lich su co "Sach Phuong Phap Hoc Tap Feynman gia bao nhieu?"
+        # -> cau hoi moi "no con ban bao nhieu" se duoc viet lai thanh
+        # "Sach Phuong Phap Hoc Tap Feynman con ban bao nhieu?" truoc khi dua
+        # vao FAISS tim kiem - tranh tinh trang dai tu ("no", "cai do"...)
+        # khien FAISS tim ra doan van khong lien quan.
+        self.rewrite_prompt = PromptTemplate(
+            input_variables=["history", "question"],
+            template="""Dua vao doan hoi thoai gan day giua nguoi dung va tro ly ban ban sach,
+hay viet lai CAU HOI MOI cua nguoi dung thanh 1 cau hoi DOC LAP, day du y nghia,
+khong con phu thuoc vao dai tu ("no", "cai do", "quyen do", "san pham do"...) hay
+ngu canh phia truoc.
+
+LICH SU HOI THOAI:
+{history}
+
+CAU HOI MOI: {question}
+
+HUONG DAN:
+- Neu cau hoi moi da ro nghia, DOC LAP san (khong can lich su van hieu duoc), giu nguyen y, chi tra ve lai chinh no
+- Neu cau hoi moi phu thuoc vao lich su (dai tu, nhac lai an y ten san pham/chu de truoc do), hay thay the bang ten cu the lay tu lich su
+- Chi tra ve DUY NHAT cau hoi da viet lai, khong giai thich, khong ghi chu them
+- Giu nguyen tieng Viet
+
+CAU HOI DA VIET LAI:"""
+        )
+        self.rewrite_chain = self.rewrite_prompt | self.llm | StrOutputParser()
 
         self.vector_store = None
         self.products_json_path = None  # duong dan products.json, de lay gia/ton kho MOI NHAT khi hoi
@@ -240,6 +270,46 @@ TRA LOI:"""
 
         return "\n\n---\n\n".join(context_parts)
 
+    def _format_history(self, history: List[Dict]) -> str:
+        """Chuyen list [{role, content}, ...] thanh doan van ban de dua vao prompt.
+        Chi lay toi da 3 cap hoi-dap gan nhat (6 dong) de prompt khong qua dai."""
+        recent = history[-6:] if history else []
+        lines = []
+        for turn in recent:
+            role = turn.get("role")
+            content = (turn.get("content") or "").strip()
+            if not content:
+                continue
+            speaker = "Nguoi dung" if role == "user" else "Tro ly"
+            lines.append(f"{speaker}: {content}")
+        return "\n".join(lines)
+
+    def _rewrite_question_with_history(self, question: str, history: Optional[List[Dict]]) -> str:
+        """Dung LLM viet lai cau hoi cho doc lap dua vao lich su hoi thoai gan nhat.
+        Neu chua co lich su (lan hoi dau tien) hoac co loi khi goi LLM, tra ve
+        nguyen cau hoi goc - khong de loi o buoc nay lam gian doan ca luong hoi dap."""
+        if not history:
+            return question
+
+        history_text = self._format_history(history)
+        if not history_text:
+            return question
+
+        try:
+            rewritten = self.rewrite_chain.invoke({
+                "history": history_text,
+                "question": question
+            }).strip()
+
+            if not rewritten:
+                return question
+
+            print(f"Cau hoi goc: '{question}' -> Viet lai: '{rewritten}'")
+            return rewritten
+        except Exception as e:
+            print(f"Loi khi viet lai cau hoi (dung cau hoi goc): {e}")
+            return question
+
     def _search_and_answer(self, question: str, top_k: int = 3) -> dict:
         results = self.vector_store.similarity_search_with_score(question, k=top_k)
         live_products = self._get_live_products()
@@ -256,8 +326,13 @@ TRA LOI:"""
     # Hoi dap bang TEXT
     # ------------------------------------------------------------------
 
-    def ask(self, question: str, top_k: int = 3) -> dict:
+    def ask(self, question: str, top_k: int = 3, history: Optional[List[Dict]] = None) -> dict:
         """Tra loi cau hoi dua tren tai lieu da nap.
+
+        history: vai luot hoi-dap gan nhat, dang [{"role": "user"/"assistant",
+                 "content": "..."}], dung de viet lai cau hoi hien tai cho
+                 doc lap (giai quyet dai tu nhu "no", "cai do") truoc khi tim
+                 kiem FAISS. Truyen None hoac [] neu la luot hoi dau tien.
 
         Tra ve dict voi hai key:
           "answer"  : cau tra loi (string)
@@ -269,7 +344,9 @@ TRA LOI:"""
                 "sources": []
             }
 
-        return self._search_and_answer(question, top_k=top_k)
+        standalone_question = self._rewrite_question_with_history(question, history)
+
+        return self._search_and_answer(standalone_question, top_k=top_k)
 
     # ------------------------------------------------------------------
     # Goi y sach tu HINH ANH (Gemini Vision)
