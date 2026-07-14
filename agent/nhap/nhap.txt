@@ -1,0 +1,13 @@
+case 'ask_product':
+      case 'products_by_category':
+      case 'get_price_of_product':
+      case 'check_stock':
+      case 'compare_price':
+      case 'top_rated_products':
+      case "product_detail":
+      case 'buy_product':
+
+      note: Còn chức năng lưu từ chỉ vật (nó)
+            tính năng tự động chuyển apigemini khi hết lượt
+            bổ sung câu hỏi trọn vẹn cho wit.ai
+            

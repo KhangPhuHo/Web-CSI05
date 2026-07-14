@@ -137,6 +137,9 @@ require("./routes/productsJsonRoutes");
 
 app.use("/api", productsJsonRoutes);
 
+const witController = require('./controllers/witController');
+   app.use(witController);
+
 // RAG chatbot (Gemini) - proxy sang Python API server rieng, xem controllers/ragController.js
 const ragRoutes = require("./routes/ragRoutes");
 app.use("/api", ragRoutes);
