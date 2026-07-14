@@ -35,7 +35,9 @@ const SUGGESTED_QUESTIONS = [
   'Làm sao để đặt hàng và thanh toán?'
 ];
 
-const accessToken = 'VFDGRWWK4PW7ITLLUJZJBEX7VMKKPQNN'; // Thay token thật vào đây
+// Wit.ai access token KHONG con nam o client nua - da chuyen xu ly sang
+// backend Node (bien moi truong WIT_ACCESS_TOKEN tren Render).
+// Xem ham getWitResponse ben duoi, no goi qua NODE_API_BASE_URL/api/wit-message.
 
 // Backend Node - noi proxy sang RAG chatbot (Python), xem controllers/ragController.js
 const NODE_API_BASE_URL = 'https://bookstore-bsjx.onrender.com';
@@ -505,13 +507,12 @@ async function askRagChatbot(question) {
   }
 }
 
+// Goi Wit.ai THONG QUA backend Node (khong goi thang tu client nua) de token
+// khong bi lo ra trinh duyet. Backend se doc WIT_ACCESS_TOKEN tu bien moi
+// truong va tra ve nguyen JSON cua Wit.ai (xem route mau /api/wit-message).
 async function getWitResponse(input) {
   try {
-    const res = await fetch(`https://api.wit.ai/message?v=20230616&q=${encodeURIComponent(input)}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`, // 👉 giữ nguyên token Wit.ai của bạn
-      },
-    });
+    const res = await fetch(`${NODE_API_BASE_URL}/api/wit-message?q=${encodeURIComponent(input)}`);
     const data = await res.json();
 
     let intent = 'none';
