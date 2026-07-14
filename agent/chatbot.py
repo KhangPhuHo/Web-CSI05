@@ -18,35 +18,74 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, Docx2txtLoader
 
 
+class APIKeyManager:
+    """
+    Quan ly 1 DANH SACH nhieu Google API key va tu dong xoay vong.
+
+    Muc dich: khi dung Gemini free tier, moi key co quota rieng (VD X request/ngay).
+    Khi key dang dung bi tra ve loi het quota (HTTP 429 / ResourceExhausted),
+    thay vi chatbot bi "chet" thi se tu dong chuyen sang key tiep theo trong
+    danh sach va thu lai - khong can vao Render sua tay.
+    """
+
+    def __init__(self, keys: List[str]):
+        # Loai bo khoang trang / phan tu rong (phong khi bien moi truong co dau phay du)
+        cleaned = [k.strip() for k in keys if k and k.strip()]
+        if not cleaned:
+            raise ValueError(
+                "Danh sach API key rong! Hay dat bien moi truong GOOGLE_API_KEYS "
+                "(nhieu key, phan cach boi dau phay) hoac GOOGLE_API_KEY (1 key)."
+            )
+        self.keys = cleaned
+        self.index = 0
+
+    @property
+    def current_key(self) -> str:
+        return self.keys[self.index]
+
+    def rotate(self) -> str:
+        """Chuyen sang key tiep theo (vong tron). Tra ve key moi."""
+        self.index = (self.index + 1) % len(self.keys)
+        print(f"[APIKeyManager] Da chuyen sang API key #{self.index + 1}/{len(self.keys)}")
+        return self.current_key
+
+    def __len__(self):
+        return len(self.keys)
+
+
+def _is_quota_error(err: Exception) -> bool:
+    """Nhan dien loi 'het quota / rate limit' tu Google Gemini API.
+    Cac loi nay thuong co ma 429 hoac ten ResourceExhausted trong message,
+    du thu vien co the wrap lai thanh nhieu kieu Exception khac nhau."""
+    msg = str(err).lower()
+    return (
+        "429" in msg
+        or "resourceexhausted" in msg
+        or "quota" in msg
+        or "rate limit" in msg
+        or "resource has been exhausted" in msg
+    )
+
+
 class RAGChatbot:
     """Chatbot hoi dap tai lieu (RAG) + goi y sach tu hinh anh (Gemini Vision)."""
 
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("Khong tim thay GOOGLE_API_KEY trong file .env!")
-
-        self.embedding_model = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
-            google_api_key=api_key
-        )
-
-        # temperature=0.1: can bang giua chinh xac va tu nhien, phu hop voi Q&A tai lieu
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-flash-lite-latest",
-            google_api_key=api_key,
-            temperature=0.1
-        )
-
-        # Model rieng cho Gemini Vision (doc hinh anh)
-        # Dung alias "-latest" (tu dong tro sang ban flash-lite moi nhat con ton tai)
-        # thay vi ghim ten model cu the - tranh loi khi Google khai tu model doi cu
-        # (VD gemini-2.0-flash-lite da bi ngung hoan toan tu 1/6/2026)
-        self.vision_model = ChatGoogleGenerativeAI(
-            model="gemini-flash-lite-latest",
-            google_api_key=api_key,
-            temperature=0.2
-        )
+        # ------------------------------------------------------------
+        # Doc DANH SACH API key thay vi chi 1 key duy nhat.
+        # Uu tien GOOGLE_API_KEYS (nhieu key, cach nhau boi dau phay),
+        # neu khong co thi fallback ve GOOGLE_API_KEY (1 key, cho tuong thich nguoc).
+        #
+        # Vi du trong file .env (hoac Environment Variables tren Render):
+        #   GOOGLE_API_KEYS=AIzaSy_key_thu_nhat,AIzaSy_key_thu_hai,AIzaSy_key_thu_ba
+        # ------------------------------------------------------------
+        keys_str = os.getenv("GOOGLE_API_KEYS") or os.getenv("GOOGLE_API_KEY")
+        if not keys_str:
+            raise ValueError(
+                "Khong tim thay GOOGLE_API_KEYS (hoac GOOGLE_API_KEY) trong file .env!"
+            )
+        api_keys = [k.strip() for k in keys_str.split(",") if k.strip()]
+        self.key_manager = APIKeyManager(api_keys)
 
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=500,
@@ -75,10 +114,6 @@ HUONG DAN:
 TRA LOI:"""
         )
 
-        # Pipe operator |: ket noi cac buoc xu ly theo thu tu
-        # prompt -> llm -> StrOutputParser (lay chuoi text thuan tu AIMessage)
-        self.chain = self.prompt | self.llm | StrOutputParser()
-
         # ------------------------------------------------------------------
         # Prompt viet lai cau hoi cho "doc lap" dua vao lich su hoi thoai gan
         # nhat. VD: lich su co "Sach Phuong Phap Hoc Tap Feynman gia bao nhieu?"
@@ -106,12 +141,75 @@ HUONG DAN:
 
 CAU HOI DA VIET LAI:"""
         )
-        self.rewrite_chain = self.rewrite_prompt | self.llm | StrOutputParser()
+        # Khoi tao embedding_model / llm / vision_model / chain / rewrite_chain
+        # theo key hien tai. Ham nay se duoc goi lai moi khi APIKeyManager xoay
+        # sang key khac (het quota), de cac chain dung dung key moi.
+        self._build_models(self.key_manager.current_key)
 
         self.vector_store = None
         self.products_json_path = None  # duong dan products.json, de lay gia/ton kho MOI NHAT khi hoi
 
-        print("RAGChatbot khoi tao thanh cong!")
+        print(f"RAGChatbot khoi tao thanh cong! (dang dung {len(self.key_manager)} API key, bat dau tu key #1)")
+
+    def _build_models(self, api_key: str):
+        """Tao lai embedding_model, llm, vision_model va cac chain voi 1 api_key cu the.
+        Duoc goi luc khoi tao, va goi lai moi khi xoay sang key khac."""
+        self.embedding_model = GoogleGenerativeAIEmbeddings(
+            model="models/gemini-embedding-001",
+            google_api_key=api_key
+        )
+
+        # temperature=0.1: can bang giua chinh xac va tu nhien, phu hop voi Q&A tai lieu
+        self.llm = ChatGoogleGenerativeAI(
+            model="gemini-flash-lite-latest",
+            google_api_key=api_key,
+            temperature=0.1
+        )
+
+        # Model rieng cho Gemini Vision (doc hinh anh)
+        # Dung alias "-latest" (tu dong tro sang ban flash-lite moi nhat con ton tai)
+        # thay vi ghim ten model cu the - tranh loi khi Google khai tu model doi cu
+        # (VD gemini-2.0-flash-lite da bi ngung hoan toan tu 1/6/2026)
+        self.vision_model = ChatGoogleGenerativeAI(
+            model="gemini-flash-lite-latest",
+            google_api_key=api_key,
+            temperature=0.2
+        )
+
+        # Pipe operator |: ket noi cac buoc xu ly theo thu tu
+        # prompt -> llm -> StrOutputParser (lay chuoi text thuan tu AIMessage)
+        self.chain = self.prompt | self.llm | StrOutputParser()
+        self.rewrite_chain = self.rewrite_prompt | self.llm | StrOutputParser()
+
+        # Neu vector_store da ton tai (dang xoay key giua chung), cap nhat luon
+        # embedding_function cua no de cac lan tim kiem sau dung key moi.
+        if getattr(self, "vector_store", None) is not None:
+            self.vector_store.embedding_function = self.embedding_model
+
+    def _call_with_key_rotation(self, func):
+        """
+        Goi func() (khong tham so) va tu dong xoay sang API key tiep theo neu
+        gap loi het quota (429), roi thu lai - cho den khi thanh cong hoac da
+        thu HET tat ca key trong danh sach.
+
+        func thuong la 1 lambda goi self.chain.invoke(...), self.vector_store.similarity_search_with_score(...)...
+        """
+        last_err = None
+        attempts = len(self.key_manager)
+        for _ in range(attempts):
+            try:
+                return func()
+            except Exception as e:
+                if _is_quota_error(e):
+                    last_err = e
+                    print(f"[APIKeyManager] Key #{self.key_manager.index + 1} het quota ({e}). Dang xoay sang key ke tiep...")
+                    new_key = self.key_manager.rotate()
+                    self._build_models(new_key)
+                    continue
+                raise  # loi khac (khong phai het quota) thi nem thang ra ngoai
+        raise RuntimeError(
+            f"Tat ca {attempts} API key trong danh sach deu da het quota. Loi cuoi cung: {last_err}"
+        )
 
     # ------------------------------------------------------------------
     # Nap tai lieu / xay dung vector store
@@ -208,7 +306,9 @@ CAU HOI DA VIET LAI:"""
         print(f"   -> Tao ra {len(chunks)} doan")
 
         print("Dang tao embedding (goi Gemini API)...")
-        self.vector_store = FAISS.from_documents(chunks, self.embedding_model)
+        self.vector_store = self._call_with_key_rotation(
+            lambda: FAISS.from_documents(chunks, self.embedding_model)
+        )
 
         # Luu lai de lan sau dung khong can goi API
         self.vector_store.save_local(cache_path)
@@ -296,10 +396,12 @@ CAU HOI DA VIET LAI:"""
             return question
 
         try:
-            rewritten = self.rewrite_chain.invoke({
-                "history": history_text,
-                "question": question
-            }).strip()
+            rewritten = self._call_with_key_rotation(
+                lambda: self.rewrite_chain.invoke({
+                    "history": history_text,
+                    "question": question
+                })
+            ).strip()
 
             if not rewritten:
                 return question
@@ -311,11 +413,15 @@ CAU HOI DA VIET LAI:"""
             return question
 
     def _search_and_answer(self, question: str, top_k: int = 3) -> dict:
-        results = self.vector_store.similarity_search_with_score(question, k=top_k)
+        results = self._call_with_key_rotation(
+            lambda: self.vector_store.similarity_search_with_score(question, k=top_k)
+        )
         live_products = self._get_live_products()
         context = self._build_context(results, live_products)
 
-        answer = self.chain.invoke({"context": context, "question": question})
+        answer = self._call_with_key_rotation(
+            lambda: self.chain.invoke({"context": context, "question": question})
+        )
 
         return {
             "answer": answer,
@@ -376,7 +482,7 @@ CAU HOI DA VIET LAI:"""
             ]
         )
 
-        response = self.vision_model.invoke([message])
+        response = self._call_with_key_rotation(lambda: self.vision_model.invoke([message]))
         description = self._extract_text(response.content)
 
         if not description:
