@@ -10,7 +10,8 @@
 # Chay prod: uvicorn api_server:app --host 0.0.0.0 --port $PORT
 
 import os
-from typing import List
+import threading
+from typing import List, Optional
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,10 +34,34 @@ PRODUCTS_JSON_PATH = "data/text/products.json"
 
 app = FastAPI(title="RAG Chatbot API", version="1.0.0")
 
-print("Dang khoi tao RAGChatbot (co the mat vai giay neu chua co cache vector_store/)...")
-bot = RAGChatbot()
-bot.load_documents(PRODUCTS_JSON_PATH)
-print("RAGChatbot da san sang nhan request!")
+# Trang thai khoi tao RAGChatbot - CHAY NGAM (background thread), KHONG chan
+# viec uvicorn mo cong lang nghe. Neu de RAGChatbot()/load_documents() chay
+# truc tiep o top-level (nhu ban cu), toan bo qua trinh import file se bi
+# chan lai cho toi khi tai xong model + FAISS - luc "thuc day" sau khi ngu
+# ca dem, buoc nay co the lau hon thoi gian Render cho, khien Render tuong
+# service "khong khoi dong duoc" va tra ve trang loi thay vi doi.
+bot: Optional[RAGChatbot] = None
+bot_ready = False
+bot_error: Optional[str] = None
+
+
+def _load_bot_in_background():
+    global bot, bot_ready, bot_error
+    try:
+        print("Dang khoi tao RAGChatbot (chay ngam, khong chan cong lang nghe)...")
+        instance = RAGChatbot()
+        instance.load_documents(PRODUCTS_JSON_PATH)
+        bot = instance
+        bot_ready = True
+        print("RAGChatbot da san sang nhan request!")
+    except Exception as e:
+        bot_error = str(e)
+        print(f"Loi khi khoi tao RAGChatbot: {e}")
+
+
+@app.on_event("startup")
+def on_startup():
+    threading.Thread(target=_load_bot_in_background, daemon=True).start()
 
 
 def verify_api_key(x_api_key: str = Header(alias="X-API-Key")):
@@ -48,6 +73,24 @@ def verify_api_key(x_api_key: str = Header(alias="X-API-Key")):
     """
     if not x_api_key or x_api_key != RAG_API_KEY:
         raise HTTPException(status_code=401, detail="API key khong hop le hoac bi thieu.")
+
+
+def ensure_bot_ready():
+    """
+    Goi o dau moi endpoint can dung bot - neu RAGChatbot chua tai xong (dang
+    chay ngam) hoac tai loi, tra ve thong bao ro rang thay vi de client nhan
+    loi mo ho hoac cho vo han.
+    """
+    if bot_error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"RAGChatbot khoi tao that bai: {bot_error}"
+        )
+    if not bot_ready:
+        raise HTTPException(
+            status_code=503,
+            detail="Server dang khoi dong (tai model/du lieu), vui long thu lai sau vai giay."
+        )
 
 
 # ------------------------------------------------------------------
@@ -66,6 +109,8 @@ class AskResponse(BaseModel):
 
 @app.post("/ask", response_model=AskResponse, dependencies=[Depends(verify_api_key)])
 async def ask(payload: AskRequest):
+    ensure_bot_ready()
+
     if not payload.question or not payload.question.strip():
         raise HTTPException(status_code=400, detail="Truong 'question' khong duoc de trong.")
 
@@ -89,6 +134,8 @@ class RecommendFromImageResponse(BaseModel):
     dependencies=[Depends(verify_api_key)]
 )
 async def recommend_from_image(image: UploadFile = File(...)):
+    ensure_bot_ready()
+
     if not image.content_type or not image.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File gui len khong phai hinh anh.")
 
@@ -108,4 +155,7 @@ async def recommend_from_image(image: UploadFile = File(...)):
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    # Luon tra ve NGAY LAP TUC, khong phu thuoc bot_ready - dung de Render
+    # (hoac dich vu keep-alive) xac nhan server con song, tach biet voi
+    # trang thai "da san sang xu ly RAG" (xem field bot_ready)
+    return {"status": "ok", "bot_ready": bot_ready, "bot_error": bot_error}
