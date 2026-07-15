@@ -427,6 +427,90 @@ CAU HOI DA VIET LAI:"""
             print(f"Loi khi viet lai cau hoi (dung cau hoi goc): {e}")
             return question
 
+    def _detect_aggregate_query(self, question: str):
+        """
+        Nhan dien cac cau hoi dang "cao nhat/thap nhat/re nhat/con nhieu nhat..."
+        - nhung cau nay CAN SO SANH SO giua TAT CA san pham, ma FAISS (tim kiem
+        ngu nghia) khong lam duoc: no chi lay top_k doan "giong nghia" voi cau
+        hoi, khong dam bao san pham co gia tri lon nhat/nho nhat nam trong do.
+
+        Tra ve (field, order) neu nhan dien duoc, vi du ("avgRating", "desc"),
+        hoac None neu day la cau hoi thong thuong (van di qua FAISS nhu cu).
+        """
+        q = question.lower()
+
+        if any(k in q for k in ["đánh giá cao", "đánh giá tốt", "nhiều sao", "sao cao", "tốt nhất"]):
+            return ("avgRating", "desc")
+
+        if any(k in q for k in ["đánh giá thấp", "đánh giá kém", "ít sao", "sao thấp", "kém nhất"]):
+            return ("avgRating", "asc")
+
+        if any(k in q for k in ["rẻ nhất", "giá thấp", "giá rẻ"]):
+            return ("price", "asc")
+
+        if any(k in q for k in ["đắt nhất", "giá cao", "giá đắt"]):
+            return ("price", "desc")
+
+        if any(k in q for k in ["còn nhiều nhất", "tồn kho nhiều", "hàng nhiều nhất"]):
+            return ("stock", "desc")
+
+        if any(k in q for k in ["sắp hết hàng", "còn ít nhất", "tồn kho ít", "hàng ít nhất"]):
+            return ("stock", "asc")
+
+        return None
+
+    def _answer_aggregate_query(self, question: str, field: str, order: str, top_n: int = 3) -> dict:
+        """
+        Tra loi cau hoi so sanh (cao nhat/thap nhat...) bang cach doc TOAN BO
+        products.json, sap xep THAT SU theo field yeu cau, roi moi dua top_n
+        san pham DUNG NHAT vao prompt - dam bao chinh xac 100%, khong phu
+        thuoc vao viec FAISS co "tinh co" tim ra dung san pham hay khong.
+        """
+        live_products = self._get_live_products()
+
+        items = []
+        for pid, p in live_products.items():
+            # San pham chua co ai danh gia thi bo qua khoi xep hang theo rating
+            if field == "avgRating" and not p.get("ratingCount"):
+                continue
+
+            value = p.get(field)
+            if value is None:
+                continue
+
+            items.append((pid, p, value))
+
+        if not items:
+            return {
+                "answer": "Hiện chưa có đủ dữ liệu để trả lời câu hỏi này.",
+                "sources": []
+            }
+
+        items.sort(key=lambda x: x[2], reverse=(order == "desc"))
+        top_items = items[:top_n]
+
+        lines = []
+        for pid, p, value in top_items:
+            genres = p.get("genres", [])
+            genres_str = ", ".join(genres) if isinstance(genres, list) else genres
+            lines.append(
+                f"- {p.get('name')} | Tác giả: {p.get('author')} | Thể loại: {genres_str} | "
+                f"Giá: {p.get('price')} VND | Tồn kho: {p.get('stock')} | "
+                f"Đánh giá: {p.get('avgRating', 0)}/5 ({p.get('ratingCount', 0)} lượt)"
+            )
+
+        context = (
+            "Danh sách sau đã được HỆ THỐNG SẮP XẾP CHÍNH XÁC theo đúng yêu cầu "
+            "của câu hỏi (không phải do bạn tự chọn), hãy trả lời dựa đúng theo "
+            "thứ tự này:\n" + "\n".join(lines)
+        )
+
+        answer = self._call_with_key_rotation(
+            lambda: self.chain.invoke({"context": context, "question": question})
+        )
+
+        return {"answer": answer, "sources": lines}
+
     def _search_and_answer(self, question: str, top_k: int = 3) -> dict:
         results = self._call_with_key_rotation(
             lambda: self.vector_store.similarity_search_with_score(question, k=top_k)
@@ -466,6 +550,14 @@ CAU HOI DA VIET LAI:"""
             }
 
         standalone_question = self._rewrite_question_with_history(question, history)
+
+        # Cau hoi dang "cao nhat/re nhat/con nhieu nhat..." can so sanh so
+        # giua TAT CA san pham - FAISS (tim kiem ngu nghia) khong lam duoc
+        # viec nay, nen xu ly rieng bang cach doc va sap xep truc tiep.
+        aggregate = self._detect_aggregate_query(standalone_question)
+        if aggregate:
+            field, order = aggregate
+            return self._answer_aggregate_query(standalone_question, field, order)
 
         return self._search_and_answer(standalone_question, top_k=top_k)
 
