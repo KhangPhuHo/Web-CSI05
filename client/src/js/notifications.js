@@ -1,10 +1,12 @@
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { db } from './firebase-config.js';
+import { showToast } from './toast.js';
 
 const VAPID_KEY = "BFqqkrZrXw4yOgXToHv9r5u7oA_A7tBte2y-2Wr0hhAaXuqv_mQ10c4GhfSuAZ9USEBRID19nBlRoFnSO4CGHRw";
 
-async function setupPushNotification(uid) {
+export async function setupPushNotification(uid) {
   try {
-    // Đăng ký service worker (chỉ cần 1 lần, trình duyệt tự cache lại)
     const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
 
     const permission = await Notification.requestPermission();
@@ -20,7 +22,6 @@ async function setupPushNotification(uid) {
     });
 
     if (token) {
-      // Lưu token vào document user để backend biết gửi push tới đâu
       await setDoc(doc(db, "users", uid), { fcmToken: token }, { merge: true });
     }
   } catch (error) {
@@ -28,12 +29,10 @@ async function setupPushNotification(uid) {
   }
 }
 
-// Xử lý khi push đến LÚC tab đang MỞ (foreground) - onBackgroundMessage
-// trong service worker không tự chạy trong trường hợp này
-function listenForegroundMessages() {
+export function listenForegroundMessages() {
   const messaging = getMessaging();
   onMessage(messaging, (payload) => {
     const { title, body } = payload.notification;
-    showToast(`${title}: ${body}`, "info"); // dùng lại toast.js đã có sẵn
+    showToast(`${title}: ${body}`, "info");
   });
 }

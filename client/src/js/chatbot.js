@@ -1,10 +1,9 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-// add collection, addDoc, serverTimestamp for notification:
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp }
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp } 
   from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
 import { showToast } from './toast.js';
+import { setupPushNotification, listenForegroundMessages } from './notifications.js'; // 👈 thêm dòng này
 
 let currentUserId = null;
 let currentUserUid = null;
