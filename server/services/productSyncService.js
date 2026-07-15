@@ -78,6 +78,68 @@ async function syncProductToJson(db, productId) {
   console.log("✅ Synced:", productId);
 }
 
+async function syncRatingToJson(db, productId) {
+
+  // Doc TAT CA danh gia trong subcollection products/{productId}/ratings
+  // (moi doc: { rating, timestamp, uid }) roi tinh trung binh - KHONG luu
+  // tung danh gia le vao products.json, chi luu 1 con so trung binh.
+  const ratingsSnap = await db
+    .collection("products")
+    .doc(productId)
+    .collection("ratings")
+    .get();
+
+  const ratings = [];
+
+  ratingsSnap.forEach(doc => {
+    const value = doc.data().rating;
+
+    if (typeof value === "number" && !Number.isNaN(value)) {
+      ratings.push(value);
+    }
+  });
+
+  const ratingCount = ratings.length;
+
+  const avgRating = ratingCount
+    ? Math.round(
+        (ratings.reduce((sum, r) => sum + r, 0) / ratingCount) * 10
+      ) / 10 // lam tron 1 chu so thap phan, VD 4.3
+    : 0;
+
+  let jsonData = {};
+
+  if (fs.existsSync(PRODUCTS_JSON_PATH)) {
+
+    jsonData = JSON.parse(
+      fs.readFileSync(PRODUCTS_JSON_PATH, "utf8")
+    );
+  }
+
+  if (!jsonData[productId]) {
+    // San pham nay chua tung duoc sync vao products.json (VD chua co
+    // summary/AI data) - bo qua, tranh tao ra 1 entry thieu du lieu khac
+    console.log(
+      `⚠️ Bo qua sync rating: san pham ${productId} chua co trong products.json`
+    );
+    return;
+  }
+
+  // CHI patch 2 field nay, giu nguyen moi thu khac (summary, gia, ton kho...)
+  jsonData[productId].avgRating = avgRating;
+  jsonData[productId].ratingCount = ratingCount;
+
+  fs.writeFileSync(
+    PRODUCTS_JSON_PATH,
+    JSON.stringify(jsonData, null, 2),
+    "utf8"
+  );
+
+  console.log(
+    `⭐ Synced rating cho ${productId}: ${avgRating}/5 (${ratingCount} danh gia)`
+  );
+}
+
 async function deleteProductFromJson(productId) {
 
   let jsonData = {};
@@ -105,5 +167,6 @@ async function deleteProductFromJson(productId) {
 
 module.exports = {
   syncProductToJson,
+  syncRatingToJson,
   deleteProductFromJson
 };

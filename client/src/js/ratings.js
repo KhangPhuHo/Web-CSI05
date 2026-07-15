@@ -10,6 +10,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { showToast } from './toast.js';
 
+// Backend Node - dung de bao server tinh lai trung binh sao va luu vao
+// products.json (xem route POST /api/sync-rating/:id, productSyncService.js)
+const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
+
 
 export function loadRatingUI(productId) {
   const container = document.createElement("div");
@@ -93,6 +97,16 @@ async function submitRating(productId, ratingValue) {
     rating: ratingValue,
     uid: user.uid,
     timestamp: Date.now()
+  });
+
+  // Bao backend tinh lai trung binh sao va luu vao products.json (de chatbot
+  // AI biet duoc so sao khi tra loi). Khong await chan UI, va loi o day
+  // (VD mang cham) khong lam anh huong den viec danh gia da luu thanh cong -
+  // chi log de biet, khong hien loi cho nguoi dung.
+  fetch(`${API_BASE_URL}/api/sync-rating/${productId}`, {
+    method: "POST"
+  }).catch(err => {
+    console.error("Khong the dong bo rating len products.json:", err);
   });
 
   //showToast("🎉 Đánh giá của bạn đã được ghi nhận!", "success");

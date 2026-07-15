@@ -104,9 +104,10 @@ CAU HOI: {question}
 
 HUONG DAN:
 - Tra loi DUA TREN thong tin trong tai lieu o tren
-- Moi doan co the kem dong thong tin san pham (Ten sach/Tac gia/The loai/Gia/Ton kho)
-  ngay truoc noi dung - neu cau hoi ve gia, con hang hay khong, hoac the loai, hay lay
-  TRUC TIEP tu dong thong tin nay, khong can suy dien tu phan noi dung ben duoi
+- Moi doan co the kem dong thong tin san pham (Ten sach/Tac gia/The loai/Gia/Ton kho/Danh gia)
+  ngay truoc noi dung - neu cau hoi ve gia, con hang hay khong, the loai, hoac
+  duoc danh gia may sao, hay lay TRUC TIEP tu dong thong tin nay, khong can
+  suy dien tu phan noi dung ben duoi
 - Neu tai lieu khong du thong tin, hay noi: "Tai lieu khong co thong tin ve van de nay"
 - Tra loi bang tieng Viet, ro rang va de hieu
 - Khong bia them thong tin ngoai tai lieu
@@ -255,6 +256,10 @@ CAU HOI DA VIET LAI:"""
                 "stock": product.get("stock"),
                 # Noi thanh chuoi vi nhieu vector store khong nhan metadata dang list
                 "genres": ", ".join(genres) if isinstance(genres, list) else genres,
+                # Trung binh sao + so luot danh gia - Node backend tinh san
+                # tu subcollection ratings trong Firestore (xem syncRatingToJson)
+                "avgRating": product.get("avgRating"),
+                "ratingCount": product.get("ratingCount"),
                 "source": file_path,
             }
 
@@ -349,17 +354,27 @@ CAU HOI DA VIET LAI:"""
                 price = live.get("price", meta.get("price"))
                 stock = live.get("stock", meta.get("stock"))
                 genres_final = genres_str or meta.get("genres")
+                avg_rating = live.get("avgRating", meta.get("avgRating"))
+                rating_count = live.get("ratingCount", meta.get("ratingCount"))
             else:
                 name = meta.get("name")
                 author = meta.get("author")
                 genres_final = meta.get("genres")
                 price = meta.get("price")
                 stock = meta.get("stock")
+                avg_rating = meta.get("avgRating")
+                rating_count = meta.get("ratingCount")
+
+            if avg_rating is not None and rating_count:
+                rating_text = f"{avg_rating}/5 ({rating_count} lượt đánh giá)"
+            else:
+                rating_text = "Chưa có đánh giá"
 
             if name:
                 info_line = (
                     f"Tên sách: {name} | Tác giả: {author} | "
-                    f"Thể loại: {genres_final} | Giá: {price} VND | Tồn kho: {stock}"
+                    f"Thể loại: {genres_final} | Giá: {price} VND | "
+                    f"Tồn kho: {stock} | Đánh giá: {rating_text}"
                 )
                 part = f"[Đoạn {i+1}] ({info_line})\n{doc.page_content}"
             else:

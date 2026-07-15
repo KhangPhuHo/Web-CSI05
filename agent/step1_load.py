@@ -56,6 +56,10 @@ def load_products_json(file_path: str):
             # Noi thanh chuoi vi nhieu vector store (Chroma...) khong
             # chap nhan metadata la list, chi chap nhan str/int/float/bool
             "genres": ", ".join(genres) if isinstance(genres, list) else genres,
+            # Trung binh sao + so luot danh gia - duoc backend Node tinh san
+            # tu subcollection ratings trong Firestore (xem syncRatingToJson)
+            "avgRating": product.get("avgRating"),
+            "ratingCount": product.get("ratingCount"),
             "source": file_path,
         }
 
