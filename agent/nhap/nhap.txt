@@ -7,7 +7,5 @@ case 'ask_product':
       case "product_detail":
       case 'buy_product':
 
-      note: Còn chức năng lưu từ chỉ vật (nó)
-            tính năng tự động chuyển apigemini khi hết lượt
-            bổ sung câu hỏi trọn vẹn cho wit.ai
+      note: bổ sung câu hỏi trọn vẹn cho wit.ai
             

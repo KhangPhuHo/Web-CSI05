@@ -67,9 +67,16 @@ exports.askRag = async (req, res) => {
 
     } catch (error) {
         console.error("Loi khi goi RAG server (/ask):", error);
-        res.status(502).json({
+
+        // QUAN TRONG: khi container Render "ngu" lau, chinh gateway cua Render
+        // co the tra ve trang loi HTML (JSON.parse that bai) TRUOC KHI request
+        // toi duoc app Python - day la 1 dang khac cua "server dang khoi dong",
+        // khong phai loi that su. Tra ve 503 (thay vi 502) de chatbot.js (da co
+        // san co che tu dong cho + hoi lai khi gap 503) tiep tuc thu, thay vi
+        // bo cuoc ngay o lan dau.
+        res.status(503).json({
             success: false,
-            message: "Khong the ket noi toi RAG server."
+            message: "RAG server dang khoi dong hoac tam thoi khong phan hoi, vui long thu lai."
         });
     }
 };
@@ -123,9 +130,11 @@ exports.recommendFromImageRag = async (req, res) => {
 
     } catch (error) {
         console.error("Loi khi goi RAG server (/recommend-from-image):", error);
-        res.status(502).json({
+
+        // Ly do giong het nhanh /ask ben tren - xem comment day du o do
+        res.status(503).json({
             success: false,
-            message: "Khong the ket noi toi RAG server."
+            message: "RAG server dang khoi dong hoac tam thoi khong phan hoi, vui long thu lai."
         });
 
     } finally {

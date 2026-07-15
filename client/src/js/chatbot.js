@@ -297,6 +297,7 @@ async function handleImageSelected(event) {
   }
 
   addImageMessage('Bạn', file, 'right');
+  removeSuggestedQuestions();
 
   const chatBody = document.getElementById('chat-body');
   const loadingMsg = document.createElement('div');
