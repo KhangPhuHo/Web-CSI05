@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/f
 // add collection, addDoc, serverTimestamp for notification:
 import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js";
 import { showToast } from './toast.js';
 
 let currentUserId = null;
@@ -20,7 +21,6 @@ onAuthStateChanged(auth, async (user) => {
         currentUserRole = userData.role;
       }
 
-      // 👉 THÊM 2 DÒNG NÀY
       await setupPushNotification(user.uid);
       listenForegroundMessages();
 
