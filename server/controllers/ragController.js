@@ -18,6 +18,8 @@ function ensureRagConfigured(res) {
     return true;
 }
 
+const { notifyUser } = require("../utils/notify");
+
 // POST /api/ask-rag  { question }
 // Trinh duyet goi vao day - KHONG can biet RAG_API_KEY la gi
 exports.askRag = async (req, res) => {
@@ -58,6 +60,13 @@ exports.askRag = async (req, res) => {
                 message: data.detail || "Loi tu RAG server."
             });
         }
+
+        // 👉 CHÈN Ở ĐÂY - ngay sau khi có câu trả lời thành công, trước khi res.json
+        await notifyUser(userId, {
+            type: "chatbot_reply",
+            title: "Chatbot đã trả lời",
+            body: data.answer.slice(0, 100)
+        });
 
         res.json({
             success: true,
@@ -121,6 +130,13 @@ exports.recommendFromImageRag = async (req, res) => {
             });
         }
 
+        // 👉 CHÈN Ở ĐÂY - ngay sau khi có câu trả lời thành công, trước khi res.json
+        await notifyUser(userId, {
+            type: "chatbot_reply",
+            title: "Chatbot đã trả lời",
+            body: data.answer.slice(0, 100)
+        });
+
         res.json({
             success: true,
             answer: data.answer,
@@ -139,6 +155,6 @@ exports.recommendFromImageRag = async (req, res) => {
 
     } finally {
         // Xoa file tam da luu tren dia, du thanh cong hay loi
-        fs.unlink(req.file.path, () => {});
+        fs.unlink(req.file.path, () => { });
     }
 };

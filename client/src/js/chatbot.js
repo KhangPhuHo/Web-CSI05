@@ -1,6 +1,8 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+// add collection, addDoc, serverTimestamp for notification:
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { showToast } from './toast.js';
 
 let currentUserId = null;
@@ -17,6 +19,11 @@ onAuthStateChanged(auth, async (user) => {
         currentUserId = userData.id;
         currentUserRole = userData.role;
       }
+
+      // 👉 THÊM 2 DÒNG NÀY
+      await setupPushNotification(user.uid);
+      listenForegroundMessages();
+
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu người dùng:", error);
       showToast("Lỗi xác thực người dùng.", "error");
@@ -258,6 +265,24 @@ function addMessage(sender, message, side) {
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
+// Ghi 1 thông báo vào Firestore cho user hiện tại (nếu đã đăng nhập).
+// Không throw lỗi ra ngoài - noti fail không được làm gián đoạn trải nghiệm chat.
+async function pushNotification(type, title, body) {
+  if (!currentUserUid) return; // khách chưa đăng nhập -> bỏ qua, không lưu noti
+
+  try {
+    await addDoc(collection(db, "users", currentUserUid, "notifications"), {
+      type,
+      title,
+      body,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Lỗi khi ghi thông báo:", error);
+  }
+}
+
 // Hien thi 1 tam anh trong khung chat (dung ObjectURL - chi hien thi tam thoi
 // trong trinh duyet, khong can doi upload xong moi hien)
 function addImageMessage(sender, file, side) {
@@ -310,6 +335,14 @@ async function handleImageSelected(event) {
     const result = await recommendFromImageRag(file);
     loadingMsg.remove();
     addMessage('Chatbot', result.answer, 'left');
+
+    // ✅ Thông báo: chatbot vừa gợi ý xong từ ảnh
+    pushNotification(
+      "chatbot_reply",
+      "Chatbot đã gợi ý sách từ ảnh",
+      result.answer.length > 100 ? result.answer.slice(0, 100) + "..." : result.answer
+    );
+
   } catch (error) {
     loadingMsg.remove();
     console.error('Lỗi khi xử lý ảnh:', error);
@@ -388,7 +421,7 @@ async function handleCommand(input) {
   }
 
   // ✅ Cấp quyền admin
-    if (command === "user" && parts.length >= 4 && parts[3] === "admin") {
+  if (command === "user" && parts.length >= 4 && parts[3] === "admin") {
     const targetUserId = parts[2];
 
     try {
@@ -486,7 +519,8 @@ async function askRagChatbot(question) {
         headers: { 'Content-Type': 'application/json' },
         // Gui kem lich su hoi-dap gan nhat (KHONG bao gom cau hoi hien tai) de
         // server viet lai cau hoi cho doc lap truoc khi tim FAISS
-        body: JSON.stringify({ question, history: conversationHistory })
+        // Mới - gửi kèm userId để Node biết gửi noti cho ai:
+        body: JSON.stringify({ question, history: conversationHistory, userId: currentUserUid })
       }),
       () => addMessage(
         'Chatbot',
@@ -515,6 +549,13 @@ async function askRagChatbot(question) {
     if (conversationHistory.length > MAX_HISTORY_TURNS) {
       conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS);
     }
+
+    // ✅ Thông báo: chatbot vừa trả lời xong
+    pushNotification(
+      "chatbot_reply",
+      "Chatbot đã trả lời",
+      data.answer.length > 100 ? data.answer.slice(0, 100) + "..." : data.answer
+    );
 
     return data.answer;
 
