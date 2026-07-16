@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Không tìm thấy trang | BookStore</title>
+<style>
+  :root{
+    --blue: #2F6FED;
+    --blue-dark: #1D4ED8;
+    --navy: #14213D;
+    --ink: #1E2A45;
+    --dim: #5A6785;
+    --line: #E4EAF6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    position:relative;
+    font-family:'Segoe UI', Roboto, -apple-system, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background-color:#EAF2FF;
+    isolation:isolate;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:-30px;
+    z-index:-2;
+    background:
+      radial-gradient(60% 50% at 20% 10%, rgba(47,111,237,0.10), transparent),
+      radial-gradient(50% 40% at 85% 90%, rgba(20,33,61,0.10), transparent),
+      #EAF2FF;
+  }
+
+  main{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:48px 24px 64px;
+  }
+  .stage{
+    max-width:620px;
+    width:100%;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(47,111,237,0.18);
+    color:var(--blue-dark);
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:0.04em;
+    padding:8px 18px;
+    border-radius:999px;
+    margin-bottom:26px;
+    box-shadow:0 8px 20px rgba(47,111,237,0.14);
+  }
+  .badge .dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--blue);
+    box-shadow:0 0 0 3px rgba(47,111,237,0.18);
+  }
+
+  .big-404{
+    font-size:clamp(96px, 22vw, 180px);
+    font-weight:800;
+    line-height:1;
+    letter-spacing:-4px;
+    background:linear-gradient(160deg, var(--navy), var(--blue));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    margin-bottom:4px;
+    user-select:none;
+  }
+
+  .shelf-wrap{
+    position:relative;
+    width:290px;
+    height:170px;
+    margin-bottom:8px;
+  }
+  .shelf-wrap svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+  /* ---- The vanishing-book animation ---- */
+  #ghost-book{
+    transform-origin:145px 140px; /* base of the book, so it shrinks toward the shelf */
+    animation: book-vanish 6s ease-in-out infinite;
+  }
+  #empty-slot{
+    transform-origin:145px 90px;
+    animation: slot-appear 6s ease-in-out infinite;
+  }
+  .spark{
+    opacity:0;
+    animation: spark-pop 6s ease-in-out infinite;
+  }
+  .spark.s2{ animation-delay:0.08s; }
+  .spark.s3{ animation-delay:0.16s; }
+  .spark.s4{ animation-delay:0.04s; }
+
+  @keyframes book-vanish{
+    0%   { opacity:1; transform:translateY(0)    scale(1)    ; filter:blur(0px); }
+    38%  { opacity:1; transform:translateY(0)    scale(1)    ; filter:blur(0px); }
+    50%  { opacity:0; transform:translateY(-18px) scale(0.65); filter:blur(5px); }
+    85%  { opacity:0; transform:translateY(-18px) scale(0.65); filter:blur(5px); }
+    100% { opacity:1; transform:translateY(0)    scale(1)    ; filter:blur(0px); }
+  }
+  @keyframes slot-appear{
+    0%   { opacity:0; transform:scale(0.94); }
+    38%  { opacity:0; transform:scale(0.94); }
+    52%  { opacity:1; transform:scale(1.06); }
+    58%  { opacity:1; transform:scale(1); }
+    85%  { opacity:1; transform:scale(1); }
+    92%  { opacity:0; transform:scale(0.94); }
+    100% { opacity:0; transform:scale(0.94); }
+  }
+  @keyframes spark-pop{
+    0%, 40%  { opacity:0; transform:scale(0.3) translateY(0); }
+    47%      { opacity:1; transform:scale(1)   translateY(-4px); }
+    58%      { opacity:0; transform:scale(0.4) translateY(-14px); }
+    100%     { opacity:0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #ghost-book{ animation: book-fade-reduced 6s ease-in-out infinite; }
+    #empty-slot{ animation: slot-fade-reduced 6s ease-in-out infinite; }
+    .spark{ animation:none; opacity:0; }
+  }
+  @keyframes book-fade-reduced{
+    0%, 38%  { opacity:1; }
+    50%, 85% { opacity:0; }
+    100%     { opacity:1; }
+  }
+  @keyframes slot-fade-reduced{
+    0%, 38%  { opacity:0; }
+    50%, 85% { opacity:1; }
+    100%     { opacity:0; }
+  }
+
+  .tag{
+    position:absolute;
+    top:2px; right:6px;
+    background:var(--navy);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:5px 9px;
+    border-radius:6px;
+    transform:rotate(6deg);
+    box-shadow:0 6px 14px rgba(20,33,61,0.25);
+  }
+
+  h1.headline{
+    margin-top:18px;
+    font-size:clamp(24px,4vw,32px);
+    font-weight:800;
+    color:var(--navy);
+    letter-spacing:-0.3px;
+  }
+  .sub{
+    margin-top:12px;
+    font-size:15.5px;
+    color:var(--dim);
+    line-height:1.7;
+    max-width:440px;
+  }
+  .sub code{
+    font-family:'Consolas', monospace;
+    background:#fff;
+    border:1px solid var(--line);
+    padding:2px 7px;
+    border-radius:5px;
+    color:var(--blue-dark);
+    font-size:13px;
+  }
+
+  .actions{
+    margin-top:30px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    padding:12px 24px;
+    border-radius:10px;
+    border:1px solid transparent;
+    cursor:pointer;
+    text-decoration:none;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+  .btn-primary{
+    background:var(--blue);
+    color:#fff;
+    box-shadow:0 10px 22px rgba(47,111,237,0.28);
+  }
+  .btn-primary:hover{ transform:translateY(-2px); background:var(--blue-dark); }
+  .btn-ghost{
+    background:#fff;
+    border-color:var(--line);
+    color:var(--navy);
+  }
+  .btn-ghost:hover{ border-color:var(--blue); color:var(--blue); }
+</style>
+</head>
+<body>
+
+  <main>
+    <div class="stage">
+
+      <span class="badge"><span class="dot" aria-hidden="true"></span>LỖI 404</span>
+
+      <div class="big-404" aria-hidden="true">404</div>
+
+      <div class="shelf-wrap" aria-hidden="true">
+        <svg viewBox="0 0 290 170" xmlns="http://www.w3.org/2000/svg">
+
+          <!-- books that stay on the shelf -->
+          <rect x="14"  y="46" width="20" height="94" rx="2" fill="#1D4ED8"/>
+          <rect x="38"  y="58" width="20" height="82" rx="2" fill="#2F6FED"/>
+          <rect x="62"  y="38" width="20" height="102" rx="2" fill="#14213D"/>
+          <rect x="86"  y="66" width="20" height="74" rx="2" fill="#7FA8F5"/>
+
+          <!-- the book that vanishes -->
+          <g id="ghost-book">
+            <rect x="110" y="40" width="70" height="100" rx="6" fill="#2F6FED"/>
+            <rect x="110" y="40" width="10" height="100" rx="3" fill="#1D4ED8"/>
+            <rect x="126" y="52" width="42" height="4" rx="2" fill="rgba(255,255,255,0.55)"/>
+            <rect x="126" y="62" width="30" height="4" rx="2" fill="rgba(255,255,255,0.35)"/>
+          </g>
+
+          <!-- the empty slot left behind, with sparkles -->
+          <g id="empty-slot">
+            <rect x="110" y="40" width="70" height="100" rx="6" fill="none" stroke="#B9CCF2" stroke-width="2.5" stroke-dasharray="7 7"/>
+            <text x="145" y="98" text-anchor="middle" font-family="Segoe UI, sans-serif" font-weight="800" font-size="24" fill="#B9CCF2">?</text>
+          </g>
+          <circle class="spark s1" cx="122" cy="55" r="2.5" fill="#7FA8F5"/>
+          <circle class="spark s2" cx="168" cy="48" r="2"   fill="#2F6FED"/>
+          <circle class="spark s3" cx="150" cy="130" r="2.5" fill="#7FA8F5"/>
+          <circle class="spark s4" cx="132" cy="118" r="1.8" fill="#2F6FED"/>
+
+          <!-- other books -->
+          <rect x="184" y="52" width="20" height="88" rx="2" fill="#2F6FED"/>
+          <rect x="208" y="34" width="20" height="106" rx="2" fill="#14213D"/>
+          <rect x="232" y="60" width="20" height="80" rx="2" fill="#7FA8F5"/>
+          <rect x="256" y="44" width="20" height="96" rx="2" fill="#1D4ED8"/>
+
+          <!-- shelf plank -->
+          <rect x="4" y="140" width="282" height="10" rx="3" fill="#14213D"/>
+          <rect x="4" y="150" width="282" height="6" rx="2" fill="#0D1730" opacity="0.4"/>
+        </svg>
+        <span class="tag">MẤT TÍCH</span>
+      </div>
+
+      <h1 class="headline">Cuốn sách này không có trên kệ</h1>
+      <p class="sub">
+        Trang bạn tìm không tồn tại hoặc đã được dời đi chỗ khác.
+        Kiểm tra lại đường dẫn <code>URL</code>, hoặc quay về trang chủ để tiếp tục khám phá BookStore.
+      </p>
+
+      <div class="actions">
+        <a href="https://www.google.com" class="btn btn-primary" target="_blank" rel="noopener">Về trang tìm kiếm</a>
+        <button type="button" class="btn btn-ghost" onclick="location.reload()">Tải lại trang</button>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

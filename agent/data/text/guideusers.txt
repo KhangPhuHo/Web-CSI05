@@ -1,0 +1,243 @@
+BOOKSTORE - HƯỚNG DẪN SỬ DỤNG
+
+1. TẠO TÀI KHOẢN
+
+Có hai cách để tạo tài khoản:
+
+Cách 1: Đăng ký bằng Email
+
+* Chọn nút "Đăng ký".
+* Nhập:
+
+  * Họ và tên
+  * Email
+  * Mật khẩu
+  * Xác nhận mật khẩu
+* Nhấn "Tạo tài khoản".
+* Sau khi đăng ký thành công, bạn có thể đăng nhập ngay.
+
+Cách 2: Đăng nhập bằng Google
+
+* Chọn "Đăng nhập với Google".
+* Hệ thống sẽ sử dụng tài khoản Google hiện tại của bạn.
+* Hệ thống sẽ tự động tạo tài khoản nếu đây là lần đăng nhập đầu tiên.
+
+2. ĐĂNG NHẬP
+
+* Chọn nút "Đăng nhập".
+* Nhập Email và Mật khẩu đã đăng ký.
+* Hoặc chọn "Đăng nhập với Google".
+
+Nếu đăng nhập thành công, bạn sẽ được chuyển về trang chủ.
+
+3. TÌM KIẾM SẢN PHẨM
+
+Bạn có thể tìm sản phẩm bằng nhiều cách:
+
+* Nhập tên sách vào ô tìm kiếm.
+* Sử dụng bộ lọc giá.
+
+
+4. XEM CHI TIẾT SẢN PHẨM
+
+Trang chi tiết sản phẩm hiển thị:
+
+* Hình ảnh sản phẩm
+* Tên sách
+* Mô tả
+* Giá bán
+* Tình trạng còn hàng
+* Bình luận
+* Đánh giá của khách hàng
+
+
+5. THÊM VÀO GIỎ HÀNG
+
+* Nhấn "Thêm vào giỏ hàng".
+* Vào trang giỏ hàng( sau khi bấm vào tên người dùng và avatar thì sẽ có đường dẫn)
+* Chọn số lượng mong muốn.
+* Kiểm tra lại giỏ hàng trước khi thanh toán.
+
+
+6. ĐẶT HÀNG
+
+Các bước đặt hàng:
+
+Bước 1:
+Đăng nhập tài khoản.
+
+Bước 2:
+Chọn sản phẩm.
+
+Bước 3:
+Thêm vào giỏ hàng.
+
+Bước 4:
+Mở giỏ hàng.
+
+Bước 5:
+Kiểm tra:
+
+* Sản phẩm
+* Số lượng
+* Giá tiền
+
+Bước 6:
+Nhấn "Thanh toán".
+
+7. THANH TOÁN
+
+Sau khi chọn thanh toán:
+
+Hệ thống sẽ lấy các thông tin sau:
+* Điền đầy đủ thông tin nhận hàng.
+* Kiểm tra địa chỉ giao hàng.
+* Xác nhận đơn hàng.
+
+Sau khi hệ thống xác nhận, đơn hàng sẽ được ghi nhận và chờ xử lý.
+Lưu ý: Đơn hàng sẽ không được ghi nhận nếu người dùng chưa thêm các thông tin này ở trang Tài khoản của bạn
+
+
+8. KHI NÀO ĐƠN HÀNG ĐƯỢC GIAO?
+
+Sau khi đặt hàng thành công:
+
+* Đơn hàng sẽ được xác nhận.
+* Cửa hàng sẽ chuẩn bị sản phẩm.
+* Khi quá trình chuẩn bị hoàn tất, đơn hàng sẽ được bàn giao cho đơn vị vận chuyển.
+* Thời gian giao hàng phụ thuộc vào khu vực nhận hàng và đơn vị vận chuyển.
+
+Nếu sản phẩm đang còn hàng:
+
+* Thường sẽ được xử lý và gửi trong thời gian ngắn.
+
+Nếu sản phẩm tạm hết hàng:
+
+* Cửa hàng sẽ liên hệ với khách hàng hoặc cập nhật thời gian dự kiến có hàng.
+
+
+9. KHI NÀO HÀNG MỚI VỀ?
+
+Đối với các sản phẩm hết hàng:
+
+* Hiện tại website không có thời gian cố định cho mỗi lần nhập hàng.
+* Hàng sẽ được cập nhật ngay khi cửa hàng nhập kho.
+* Trạng thái tồn kho trên website sẽ thay đổi khi sản phẩm đã sẵn sàng để bán.
+
+Nếu cần mua một sản phẩm đang hết hàng, khách hàng có thể:
+
+* Theo dõi trang thông tin của website thường xuyên.
+* Liên hệ với cửa hàng để được thông báo khi sản phẩm có hàng trở lại.
+
+
+10. LƯU Ý
+
+* Vui lòng kiểm tra thông tin đơn hàng trước khi thanh toán.
+* Đảm bảo địa chỉ giao hàng chính xác.
+* Giữ thông tin đăng nhập an toàn.
+* Nếu gặp sự cố trong quá trình mua hàng, vui lòng liên hệ bộ phận hỗ trợ của cửa hàng.
+
+
+11. THEO DÕI ĐƠN HÀNG
+
+
+Sau khi đặt hàng thành công, khách hàng có thể theo dõi trạng thái đơn hàng trong tài khoản của mình trong trang đơn đã đặt.
+
+Các trạng thái đơn hàng bao gồm:
+
+• Chờ xác nhận
+Đơn hàng đã được gửi và đang chờ cửa hàng kiểm tra.
+
+• Đang xử lý
+Cửa hàng đã xác nhận đơn hàng và bắt đầu chuẩn bị sản phẩm.
+Sản phẩm đang được đóng gói và chuẩn bị bàn giao cho đơn vị vận chuyển.
+
+• Đang giao
+Đơn hàng đã được giao cho đơn vị vận chuyển và đang trên đường đến khách hàng.
+
+• Đã giao
+Khách hàng đã nhận được sản phẩm.
+
+• Đã hủy
+Đơn hàng đã bị hủy theo yêu cầu của khách hàng hoặc cửa hàng.
+
+• Hoàn tiền
+Đơn hàng đã được hoàn tiền theo chính sách của cửa hàng.
+
+
+12. HỦY ĐƠN HÀNG
+
+Khách hàng có thể hủy đơn hàng khi đơn hàng ở trạng thái đang chờ xác nhận.
+
+Các bước thực hiện:
+
+1. Đăng nhập tài khoản.
+2. Mở trang "đơn đã đặt".
+3. Chọn đơn hàng cần hủy.
+4. Nhấn nút có hình thùng rác.
+5. Xác nhận yêu cầu hủy.
+
+Lưu ý:
+
+* Không thể hủy khi đơn hàng đang xử lý, được giao hoặc đã giao thành công.
+* Nếu cần hỗ trợ trong trường hợp đặc biệt, vui lòng liên hệ cửa hàng.
+
+
+13. CHÍNH SÁCH HOÀN TIỀN
+
+Khách hàng có thể yêu cầu hoàn tiền trong các trường hợp sau:
+
+* Cửa hàng không còn sản phẩm sau khi đã xác nhận đơn.
+* Đơn hàng bị hủy bởi cửa hàng.
+* Khách hàng nhận sai sản phẩm.
+* Sản phẩm bị lỗi hoặc hư hỏng trong quá trình vận chuyển.
+* Các trường hợp khác theo chính sách của cửa hàng.
+
+Quy trình hoàn tiền:
+
+1. Gửi yêu cầu hoàn tiền.
+2. Cửa hàng kiểm tra thông tin.
+3. Xác nhận yêu cầu.
+4. Tiến hành hoàn tiền theo phương thức thanh toán ban đầu hoặc phương thức được hai bên thống nhất.
+
+Thời gian hoàn tiền có thể khác nhau tùy theo phương thức thanh toán.
+
+
+14. LỊCH NHẬP HÀNG
+
+Thông tin về các đợt nhập sách mới sẽ được cập nhật trên trang "Thông tin" của website.
+
+Trang này sẽ thông báo:
+
+* Danh sách sách sắp có.
+* Ngày dự kiến nhập hàng.
+* Các đầu sách mới phát hành.
+* Thời gian mở bán.
+* Chương trình đặt trước (nếu có).
+* Các thông báo quan trọng liên quan đến sản phẩm.
+
+Khách hàng nên thường xuyên theo dõi trang "Thông tin" để cập nhật các đợt nhập hàng mới nhất.
+
+15. TÍNH NĂNG THÔNG BÁO
+
+Tính năng thông báo sẽ giúp người dùng nhận thông báo khi:
+* Chatbot trả lời câu hỏi
+* Trang thông tin khi cập nhật thêm bài báo
+* Trang đơn đã đặt khi hệ thống cập nhật trạng thái đơn hàng
+
+
+16. HỖ TRỢ KHÁCH HÀNG
+
+Nếu gặp bất kỳ vấn đề nào trong quá trình:
+
+* Đăng ký tài khoản
+* Đăng nhập
+* Đặt hàng
+* Thanh toán
+* Theo dõi đơn hàng
+* Hủy đơn
+* Hoàn tiền
+
+Quý khách vui lòng liên hệ bộ phận hỗ trợ của BookStore hoặc gọi Chatbot để được giải đáp và xử lý trong thời gian sớm nhất.
+
+Xin chân thành cảm ơn Quý khách đã tin tưởng và sử dụng dịch vụ của BookStore!
