@@ -32,7 +32,12 @@ export async function setupPushNotification(uid) {
 export function listenForegroundMessages() {
   const messaging = getMessaging();
   onMessage(messaging, (payload) => {
-    const { title, body } = payload.notification;
-    showToast(`${title}: ${body}`, "info");
+    // notify.js (backend) gio gui data-only payload (khong con "notification"
+    // nua, de tranh hien thong bao trung voi service worker) - doc tu
+    // payload.data thay vi payload.notification
+    const { title, body } = payload.data || {};
+    if (title) {
+      showToast(`${title}: ${body || ""}`, "info");
+    }
   });
 }

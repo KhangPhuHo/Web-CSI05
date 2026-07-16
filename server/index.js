@@ -144,6 +144,10 @@ const witController = require('./controllers/witController');
 const ragRoutes = require("./routes/ragRoutes");
 app.use("/api", ragRoutes);
 
+// Thong bao cho cac cau tra loi "co san" (Wit.ai, khong qua RAG server)
+const notifyRoutes = require("./routes/notifyRoutes");
+app.use("/api", notifyRoutes);
+
 // ✅ Khởi động server
 app.listen(PORT, () => {
   console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);

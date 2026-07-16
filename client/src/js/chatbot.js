@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp } 
+import { doc, getDoc, setDoc } 
   from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { showToast } from './toast.js';
 import { setupPushNotification, listenForegroundMessages } from './notifications.js'; // 👈 thêm dòng này
@@ -262,24 +262,6 @@ function addMessage(sender, message, side) {
 
   chatBody.appendChild(msg);
   chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-// Ghi 1 thông báo vào Firestore cho user hiện tại (nếu đã đăng nhập).
-// Không throw lỗi ra ngoài - noti fail không được làm gián đoạn trải nghiệm chat.
-async function pushNotification(type, title, body) {
-  if (!currentUserUid) return; // khách chưa đăng nhập -> bỏ qua, không lưu noti
-
-  try {
-    await addDoc(collection(db, "users", currentUserUid, "notifications"), {
-      type,
-      title,
-      body,
-      read: false,
-      createdAt: serverTimestamp()
-    });
-  } catch (error) {
-    console.error("Lỗi khi ghi thông báo:", error);
-  }
 }
 
 // Hien thi 1 tam anh trong khung chat (dung ObjectURL - chi hien thi tam thoi
@@ -563,6 +545,26 @@ async function askRagChatbot(question) {
 // Goi Wit.ai THONG QUA backend Node (khong goi thang tu client nua) de token
 // khong bi lo ra trinh duyet. Backend se doc WIT_ACCESS_TOKEN tu bien moi
 // truong va tra ve nguyen JSON cua Wit.ai (xem route mau /api/wit-message).
+// Gui thong bao cho 1 cau tra loi "co san" (khong qua RAG) - goi Node backend
+// de gui PUSH THAT (khong chi ghi Firestore nhu pushNotification() cu).
+// Fire-and-forget: khong cho tra loi cho nguoi dung vi thong bao that bai.
+function notifyCannedReply(title, body) {
+  if (!currentUserUid) return; // khach chua dang nhap - khong co gi de gui
+
+  fetch(`${NODE_API_BASE_URL}/api/notify-canned-reply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId: currentUserUid,
+      type: 'chatbot_reply',
+      title: 'Chatbot đã trả lời',
+      body
+    })
+  }).catch(err => {
+    console.error('Gui thong bao that bai (khong anh huong cau tra loi):', err);
+  });
+}
+
 async function getWitResponse(input) {
   try {
     const res = await fetch(`${NODE_API_BASE_URL}/api/wit-message?q=${encodeURIComponent(input)}`);
@@ -574,14 +576,29 @@ async function getWitResponse(input) {
     }
 
     switch (intent) {
-      case 'greeting':
-        return 'Xin chào! Tôi có thể giúp gì cho bạn?';
-      case 'ask_features':
-        return 'Tôi có chức năng trò chuyện, giải đáp các thắc mắc của bạn về sản phẩm và dịch vụ bên chúng tôi';
-      case 'thank':
-        return 'Cảm ơn bạn vì đã tin tưởng dịch vụ bên mình';
-      case 'goodbye':
-        return 'Cảm ơn bạn, hẹn gặp lại!';
+      case 'greeting': {
+        const reply = 'Xin chào! Tôi có thể giúp gì cho bạn?';
+        // Nhanh nay tra loi hoan toan o trinh duyet, KHONG goi RAG server -
+        // dung notifyCannedReply() de goi Node backend gui push THAT, thay
+        // vi chi ghi Firestore nhu truoc
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'ask_features': {
+        const reply = 'Tôi có chức năng trò chuyện, giải đáp các thắc mắc của bạn về sản phẩm và dịch vụ bên chúng tôi';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'thank': {
+        const reply = 'Cảm ơn bạn vì đã tin tưởng dịch vụ bên mình';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'goodbye': {
+        const reply = 'Cảm ơn bạn, hẹn gặp lại!';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
       case 'ask_product':
       case 'products_by_category':
       case 'get_price_of_product':
@@ -592,6 +609,8 @@ async function getWitResponse(input) {
       case 'buy_product':
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
+        // (nhanh nay DA co thong bao roi - server-side, qua notifyUser()
+        // trong ragController.js, khong can them gi o day)
         return await askRagChatbot(input);
       default:
         // Intent khong ro / Wit.ai chua nhan dien duoc -> van thu hoi RAG chatbot,

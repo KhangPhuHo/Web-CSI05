@@ -1,0 +1,10 @@
+Chức năng thông báo(quan trọng)
+notify.js (backend)              →  chỉ gửi "data" (bỏ "notification")
+      │
+      ├─→ notifications.js (tab đang mở)   →  đọc payload.data thay vì payload.notification
+      │
+      └─→ firebase-messaging-sw.js (tab đóng/nền)
+              │  onBackgroundMessage: đọc payload.data, chỉ CÓ 1 nơi gọi showNotification()
+              │  (không còn bị trình duyệt tự động hiện thêm 1 cái nữa)
+              │
+              └─→ notificationclick (MỚI): focus tab web có sẵn, hoặc mở tab mới nếu chưa có
