@@ -164,7 +164,7 @@ async def recommend_from_image(image: UploadFile = File(...)):
 # (dung de "danh thuc" server tren Render truoc khi goi that, giong wake_up_render())
 # ------------------------------------------------------------------
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     # Luon tra ve NGAY LAP TUC, khong phu thuoc bot_ready - dung de Render
     # (hoac dich vu keep-alive) xac nhan server con song, tach biet voi
