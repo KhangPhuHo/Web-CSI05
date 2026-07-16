@@ -26,7 +26,7 @@ exports.askRag = async (req, res) => {
 
     if (!ensureRagConfigured(res)) return;
 
-    const { question, top_k, history } = req.body;
+    const { question, top_k, history, userId } = req.body;
 
     if (!question || !question.trim()) {
         return res.status(400).json({
@@ -61,12 +61,19 @@ exports.askRag = async (req, res) => {
             });
         }
 
-        // 👉 CHÈN Ở ĐÂY - ngay sau khi có câu trả lời thành công, trước khi res.json
-        await notifyUser(userId, {
-            type: "chatbot_reply",
-            title: "Chatbot đã trả lời",
-            body: data.answer.slice(0, 100)
-        });
+        // Gui push notification la 1 tac vu PHU - KHONG duoc await/throw vao
+        // luong chinh. Neu userId trong (khach chua dang nhap) hoac notifyUser
+        // loi (Firestore loi, token FCM het han...), cau tra loi van phai
+        // duoc gui ve nguoi dung binh thuong, khong duoc lam hong response.
+        if (userId) {
+            notifyUser(userId, {
+                type: "chatbot_reply",
+                title: "Chatbot đã trả lời",
+                body: data.answer.slice(0, 100)
+            }).catch(err => {
+                console.error("Gui push notification that bai (khong anh huong cau tra loi):", err);
+            });
+        }
 
         res.json({
             success: true,
@@ -104,6 +111,8 @@ exports.recommendFromImageRag = async (req, res) => {
         });
     }
 
+    const { userId } = req.body; // multer parse cac field text (ngoai file) vao req.body
+
     try {
         const fileBuffer = fs.readFileSync(req.file.path);
         const blob = new Blob([fileBuffer], { type: req.file.mimetype });
@@ -130,12 +139,17 @@ exports.recommendFromImageRag = async (req, res) => {
             });
         }
 
-        // 👉 CHÈN Ở ĐÂY - ngay sau khi có câu trả lời thành công, trước khi res.json
-        await notifyUser(userId, {
-            type: "chatbot_reply",
-            title: "Chatbot đã trả lời",
-            body: data.answer.slice(0, 100)
-        });
+        // Xem comment day du o exports.askRag - notification la tac vu PHU,
+        // khong duoc await/throw vao luong chinh
+        if (userId) {
+            notifyUser(userId, {
+                type: "chatbot_reply",
+                title: "Chatbot đã gợi ý sách từ ảnh",
+                body: data.answer.slice(0, 100)
+            }).catch(err => {
+                console.error("Gui push notification that bai (khong anh huong cau tra loi):", err);
+            });
+        }
 
         res.json({
             success: true,

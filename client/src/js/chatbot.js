@@ -335,12 +335,8 @@ async function handleImageSelected(event) {
     loadingMsg.remove();
     addMessage('Chatbot', result.answer, 'left');
 
-    // ✅ Thông báo: chatbot vừa gợi ý xong từ ảnh
-    pushNotification(
-      "chatbot_reply",
-      "Chatbot đã gợi ý sách từ ảnh",
-      result.answer.length > 100 ? result.answer.slice(0, 100) + "..." : result.answer
-    );
+    // Da chuyen sang server-side (notifyUser trong ragController.js) - vua
+    // ghi Firestore vua gui push that, tranh ghi trung 2 lan nhu truoc
 
   } catch (error) {
     loadingMsg.remove();
@@ -354,6 +350,10 @@ async function handleImageSelected(event) {
 async function recommendFromImageRag(file) {
   const formData = new FormData();
   formData.append('media', file);
+  // Gui kem userId de Node biet gui push notification cho ai (giong luong text)
+  if (currentUserUid) {
+    formData.append('userId', currentUserUid);
+  }
 
   const response = await fetchWithRagRetry(
     () => fetch(`${NODE_API_BASE_URL}/api/recommend-from-image-rag`, {
@@ -549,12 +549,8 @@ async function askRagChatbot(question) {
       conversationHistory = conversationHistory.slice(-MAX_HISTORY_TURNS);
     }
 
-    // ✅ Thông báo: chatbot vừa trả lời xong
-    pushNotification(
-      "chatbot_reply",
-      "Chatbot đã trả lời",
-      data.answer.length > 100 ? data.answer.slice(0, 100) + "..." : data.answer
-    );
+    // Da chuyen sang server-side (notifyUser trong ragController.js) - vua
+    // ghi Firestore vua gui push that, tranh ghi trung 2 lan nhu truoc
 
     return data.answer;
 
