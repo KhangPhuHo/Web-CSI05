@@ -29,7 +29,10 @@ if not RAG_API_KEY:
         "Tao 1 key ngau nhien bang: python -c \"import secrets; print(secrets.token_hex(32))\""
     )
 
-PRODUCTS_JSON_PATH = "data/text/products.json"
+DOCUMENT_SOURCES = [
+    "data/text/products.json",
+    "data/text/guideusers.txt",  # huong dan su dung / FAQ don hang, thanh toan, hoan tien...
+]
 
 
 app = FastAPI(title="RAG Chatbot API", version="1.0.0")
@@ -50,7 +53,7 @@ def _load_bot_in_background():
     try:
         print("Dang khoi tao RAGChatbot (chay ngam, khong chan cong lang nghe)...")
         instance = RAGChatbot()
-        instance.load_documents(PRODUCTS_JSON_PATH)
+        instance.load_documents(DOCUMENT_SOURCES)
         bot = instance
         bot_ready = True
         print("RAGChatbot da san sang nhan request!")

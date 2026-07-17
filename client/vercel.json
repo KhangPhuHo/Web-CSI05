@@ -5,7 +5,7 @@
   
   "headers": [
     {
-      "source": "/firebase-messaging-sw.js",
+      "source": "/sw.js",
       "headers": [
         {
           "key": "Cache-Control",

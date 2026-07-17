@@ -24,7 +24,7 @@ async function notifyUser(userId, { type, title, body }) {
         // CHI gui "data", KHONG gui "notification": neu payload co field
         // "notification", trinh duyet se TU DONG hien 1 thong bao he thong
         // (khong can code gi them) - cong voi viec service worker cua ban
-        // (firebase-messaging-sw.js) cung tu goi showNotification() rieng
+        // (sw.js) cung tu goi showNotification() rieng
         // trong onBackgroundMessage, se bi HIEN 2 LAN cho cung 1 push.
         // Gui data-only de chi co DUY NHAT service worker quyet dinh hien thi.
         data: {

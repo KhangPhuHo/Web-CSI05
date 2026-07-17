@@ -2,12 +2,20 @@ import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/fireb
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { db } from './firebase-config.js';
 import { showToast } from './toast.js';
+import { swRegistrationPromise } from './register-sw.js';
 
 const VAPID_KEY = "BFqqkrZrXw4yOgXToHv9r5u7oA_A7tBte2y-2Wr0hhAaXuqv_mQ10c4GhfSuAZ9USEBRID19nBlRoFnSO4CGHRw";
 
 export async function setupPushNotification(uid) {
   try {
-    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    // KHONG tu register() service worker rieng nua - dung lai registration
+    // chung (sw.js) da duoc dang ky 1 lan duy nhat trong register-sw.js.
+    // Dang ky 2 lan 2 file khac nhau la nguyen nhan push bi de len truoc day.
+    const registration = await swRegistrationPromise;
+    if (!registration) {
+      console.error("Chưa có service worker registration, không thể bật push.");
+      return;
+    }
 
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
