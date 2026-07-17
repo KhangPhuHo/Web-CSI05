@@ -268,28 +268,19 @@ CAU HOI DA VIET LAI:"""
         print(f"Doc thanh cong: {len(documents)} san pham tu file '{file_path}'")
         return documents
 
-    def load_documents(self, file_paths, force_rebuild: bool = False):
+    def load_documents(self, file_path: str, force_rebuild: bool = False):
         """Nap tai lieu va xay dung vector store.
 
-        file_paths: 1 duong dan (str) HOAC 1 list nhieu duong dan - vector
-                    store se GOP tat ca cac nguon nay lai voi nhau (VD vua co
-                    products.json de tra loi ve san pham, vua co 1 file .txt
-                    huong dan/FAQ de tra loi cac cau hoi chung ve don hang...).
         force_rebuild=False: dung cache neu co (nhanh, tiet kiem API quota)
         force_rebuild=True:  xoa cache va tao lai tu dau
         """
         cache_path = "vector_store"
+        ext = os.path.splitext(file_path)[1].lower()
 
-        # Cho phep truyen 1 string (nhu truoc day) hoac 1 list nhieu duong dan
-        if isinstance(file_paths, str):
-            file_paths = [file_paths]
-
-        # Ghi nho duong dan products.json (neu co trong danh sach) de sau nay
-        # _get_live_products() doc lai, lay gia/ton kho MOI NHAT tai thoi diem
-        # hoi (khong chi dua vao metadata cu trong cache)
-        for file_path in file_paths:
-            if os.path.splitext(file_path)[1].lower() == ".json":
-                self.products_json_path = file_path
+        # Ghi nho duong dan products.json de sau nay _get_live_products() doc lai,
+        # lay gia/ton kho MOI NHAT tai thoi diem hoi (khong chi dua vao metadata cu trong cache)
+        if ext == ".json":
+            self.products_json_path = file_path
 
         # Neu da co cache thi load thang, khoi mat thoi gian goi API de tao lai
         if os.path.exists(cache_path) and not force_rebuild:
@@ -302,29 +293,22 @@ CAU HOI DA VIET LAI:"""
             print("Nap vector store tu cache thanh cong!")
             return
 
-        # Doc TAT CA cac nguon, gop chung thanh 1 danh sach Document truoc khi chunk
-        all_documents = []
+        print(f"Dang doc file: {file_path}")
 
-        for file_path in file_paths:
-            print(f"Dang doc file: {file_path}")
-            ext = os.path.splitext(file_path)[1].lower()
-
-            if ext == ".json":
-                documents = self._load_products_json(file_path)
-            elif ext == ".txt":
-                documents = TextLoader(file_path, encoding="utf-8").load()
-            elif ext == ".pdf":
-                documents = PyPDFLoader(file_path).load()
-            elif ext == ".docx":
-                documents = Docx2txtLoader(file_path).load()
-            else:
-                raise ValueError(f"Dinh dang '{ext}' chua ho tro. Dung .json, .txt, .pdf hoac .docx")
-
-            all_documents.extend(documents)
+        if ext == ".json":
+            documents = self._load_products_json(file_path)
+        elif ext == ".txt":
+            documents = TextLoader(file_path, encoding="utf-8").load()
+        elif ext == ".pdf":
+            documents = PyPDFLoader(file_path).load()
+        elif ext == ".docx":
+            documents = Docx2txtLoader(file_path).load()
+        else:
+            raise ValueError(f"Dinh dang '{ext}' chua ho tro. Dung .json, .txt, .pdf hoac .docx")
 
         print("Chia van ban thanh doan nho...")
-        chunks = self.splitter.split_documents(all_documents)
-        print(f"   -> Tao ra {len(chunks)} doan (tu {len(file_paths)} nguon)")
+        chunks = self.splitter.split_documents(documents)
+        print(f"   -> Tao ra {len(chunks)} doan")
 
         print("Dang tao embedding (goi Gemini API)...")
         self.vector_store = self._call_with_key_rotation(
@@ -668,10 +652,7 @@ if __name__ == "__main__":
     print("=" * 55)
 
     bot = RAGChatbot()
-    bot.load_documents([
-        "data/text/products.json",
-        "data/text/guideusers.txt",
-    ])
+    bot.load_documents("data/text/products.json")
 
     print("\nChatbot san sang! Go 'quit' de thoat.\n")
 
