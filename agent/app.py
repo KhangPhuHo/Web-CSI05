@@ -106,9 +106,7 @@ with st.sidebar:
 
     st.divider()
 
-    # ------------------------------------------------------------
     # Goi y sach tu HINH ANH (Gemini Vision) - tinh nang moi
-    # ------------------------------------------------------------
     st.subheader("Goi y tu hinh anh")
     st.caption("Tai len 1 tam anh (khung canh, tam trang...), Gemini se doc anh va goi y sach phu hop.")
 

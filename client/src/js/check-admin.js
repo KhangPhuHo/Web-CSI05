@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { getTranslation } from './language.js'; // ✅ Thêm dòng này
+import { getTranslation } from './language.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js';
 import { showToast } from './toast.js';

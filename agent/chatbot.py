@@ -71,14 +71,13 @@ class RAGChatbot:
     """Chatbot hoi dap tai lieu (RAG) + goi y sach tu hinh anh (Gemini Vision)."""
 
     def __init__(self):
-        # ------------------------------------------------------------
+        # Note
         # Doc DANH SACH API key thay vi chi 1 key duy nhat.
         # Uu tien GOOGLE_API_KEYS (nhieu key, cach nhau boi dau phay),
         # neu khong co thi fallback ve GOOGLE_API_KEY (1 key, cho tuong thich nguoc).
         #
         # Vi du trong file .env (hoac Environment Variables tren Render):
         #   GOOGLE_API_KEYS=AIzaSy_key_thu_nhat,AIzaSy_key_thu_hai,AIzaSy_key_thu_ba
-        # ------------------------------------------------------------
         keys_str = os.getenv("GOOGLE_API_KEYS") or os.getenv("GOOGLE_API_KEY")
         if not keys_str:
             raise ValueError(
@@ -212,9 +211,7 @@ CAU HOI DA VIET LAI:"""
             f"Tat ca {attempts} API key trong danh sach deu da het quota. Loi cuoi cung: {last_err}"
         )
 
-    # ------------------------------------------------------------------
     # Nap tai lieu / xay dung vector store
-    # ------------------------------------------------------------------
 
     def _load_products_json(self, file_path: str):
         """
@@ -335,9 +332,7 @@ CAU HOI DA VIET LAI:"""
         self.vector_store.save_local(cache_path)
         print(f"Hoan thanh! Da luu cache vao '{cache_path}/'")
 
-    # ------------------------------------------------------------------
     # Ho tro: lay gia/ton kho MOI NHAT + ghep context cho prompt
-    # ------------------------------------------------------------------
 
     def _get_live_products(self) -> dict:
         """
@@ -543,9 +538,7 @@ CAU HOI DA VIET LAI:"""
             "sources": [doc.page_content for doc, _ in results]
         }
 
-    # ------------------------------------------------------------------
     # Hoi dap bang TEXT
-    # ------------------------------------------------------------------
 
     def ask(self, question: str, top_k: int = 3, history: Optional[List[Dict]] = None) -> dict:
         """Tra loi cau hoi dua tren tai lieu da nap.
@@ -577,9 +570,7 @@ CAU HOI DA VIET LAI:"""
 
         return self._search_and_answer(standalone_question, top_k=top_k)
 
-    # ------------------------------------------------------------------
     # Goi y sach tu HINH ANH (Gemini Vision)
-    # ------------------------------------------------------------------
 
     def _describe_image(self, image_bytes: bytes, mime_type: str = "image/jpeg") -> str:
         # Chuyen anh thanh mo ta van ban: chu de, cam xuc, boi canh, the loai phu hop

@@ -1,4 +1,4 @@
-// ✅ ratings.js
+// ratings.js
 import { db, auth } from './firebase-config.js';
 import { getTranslation } from './language.js';
 import {

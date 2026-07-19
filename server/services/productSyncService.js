@@ -75,7 +75,7 @@ async function syncProductToJson(db, productId) {
     PRODUCTS_JSON_PATH
   );
 
-  console.log("✅ Synced:", productId);
+  console.log(" Synced:", productId);
 }
 
 async function syncRatingToJson(db, productId) {
@@ -120,7 +120,7 @@ async function syncRatingToJson(db, productId) {
     // San pham nay chua tung duoc sync vao products.json (VD chua co
     // summary/AI data) - bo qua, tranh tao ra 1 entry thieu du lieu khac
     console.log(
-      `⚠️ Bo qua sync rating: san pham ${productId} chua co trong products.json`
+      ` Bo qua sync rating: san pham ${productId} chua co trong products.json`
     );
     return;
   }
@@ -136,7 +136,7 @@ async function syncRatingToJson(db, productId) {
   );
 
   console.log(
-    `⭐ Synced rating cho ${productId}: ${avgRating}/5 (${ratingCount} danh gia)`
+    ` Synced rating cho ${productId}: ${avgRating}/5 (${ratingCount} danh gia)`
   );
 }
 
@@ -161,7 +161,7 @@ async function deleteProductFromJson(productId) {
       "utf8"
     );
 
-    console.log("🗑️ Deleted:", productId);
+    console.log(" Deleted:", productId);
   }
 }
 

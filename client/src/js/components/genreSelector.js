@@ -498,7 +498,7 @@ export async function initGenreSelector({
         editButton.className =
             "text-blue-500 hover:text-blue-700";
 
-        editButton.textContent = "✏️";
+        editButton.textContent = "Add";
 
         editButton.title = "Sửa";
 
@@ -518,7 +518,7 @@ export async function initGenreSelector({
         deleteButton.className =
             "text-red-500 hover:text-red-700";
 
-        deleteButton.textContent = "🗑";
+        deleteButton.textContent = "Delete";
 
         deleteButton.title = "Xoá";
 
@@ -624,9 +624,7 @@ export async function initGenreSelector({
 
     }
 
-    //--------------------------------------------------
     // Events
-    //--------------------------------------------------
 
     input.addEventListener(
         "input",
@@ -642,9 +640,7 @@ export async function initGenreSelector({
         "keydown",
         e => {
 
-            //------------------------------------------
             // Không cho Enter submit form
-            //------------------------------------------
 
             if (e.key === "Enter") {
 
@@ -652,9 +648,7 @@ export async function initGenreSelector({
 
             }
 
-            //------------------------------------------
             // Backspace xoá chip cuối
-            //------------------------------------------
 
             if (
                 e.key === "Backspace" &&
@@ -695,10 +689,7 @@ export async function initGenreSelector({
 
     }
 
-    //--------------------------------------------------
     // Đồng bộ với các selector khác trên trang
-    //--------------------------------------------------
-
     function handleGenresChanged(event) {
 
         if (event?.type === "rename") {
@@ -727,9 +718,7 @@ export async function initGenreSelector({
 
     genreListeners.add(handleGenresChanged);
 
-    //--------------------------------------------------
     // Click outside
-    //--------------------------------------------------
 
     document.addEventListener(
         "click",
@@ -748,17 +737,13 @@ export async function initGenreSelector({
         }
     );
 
-    //--------------------------------------------------
     // API
-    //--------------------------------------------------
 
     renderSelected();
 
     return {
 
-        //--------------------------------------
         // Get selected genres
-        //--------------------------------------
 
         getSelected() {
 
@@ -766,9 +751,7 @@ export async function initGenreSelector({
 
         },
 
-        //--------------------------------------
         // Set selected genres
-        //--------------------------------------
 
         setSelected(arr = []) {
 
@@ -778,9 +761,7 @@ export async function initGenreSelector({
 
         },
 
-        //--------------------------------------
         // Clear
-        //--------------------------------------
 
         clear() {
 

@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/f
 import { doc, getDoc, setDoc } 
   from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 import { showToast } from './toast.js';
-import { setupPushNotification, listenForegroundMessages } from './notifications.js'; // 👈 thêm dòng này
+import { setupPushNotification, listenForegroundMessages } from './notifications.js';
 
 let currentUserId = null;
 let currentUserUid = null;
@@ -298,7 +298,7 @@ async function handleImageSelected(event) {
   // Chap nhan HAU HET dinh dang anh pho bien (jpg, png, webp, gif, bmp, svg...)
   // - dua vao MIME type do trinh duyet tu nhan dien, khong gioi han cung 1 danh sach
   if (!file.type.startsWith('image/')) {
-    showToast("❌ File này không phải hình ảnh. Vui lòng chọn 1 tệp ảnh (JPG, PNG, WEBP, GIF...).", "error");
+    showToast("File này không phải hình ảnh. Vui lòng chọn 1 tệp ảnh (JPG, PNG, WEBP, GIF...).", "error");
     return;
   }
 
@@ -368,7 +368,7 @@ async function processInput(text) {
 
 const SUPER_ADMIN_UID = "7ZXC61fOA4beVOjcxwDZFqeYu9y1";
 
-// ⚙️ Cập nhật session local khi đổi quyền
+// Cập nhật session local khi đổi quyền
 function updateLocalSessionForRoleChange({ isAdmin }) {
   const session = JSON.parse(localStorage.getItem("session"));
   if (session) {
@@ -385,7 +385,7 @@ function updateLocalSessionForRoleChange({ isAdmin }) {
 
 async function handleCommand(input) {
   if (currentUserId !== 1 || currentUserRole !== "admin") {
-    return "❗ Bạn không có quyền thực hiện lệnh này.";
+    return "Bạn không có quyền thực hiện lệnh này.";
   }
 
   const parts = input.trim().split(" ");
@@ -395,13 +395,13 @@ async function handleCommand(input) {
 
   const command = parts[1];
 
-  // 🔁 Chuyển trang
+  // Chuyển trang
   if (command.endsWith(".html")) {
     setTimeout(() => { window.location.href = command; }, 2000);
-    return `🔄 Đang chuyển đến ${command}...`;
+    return `Đang chuyển đến ${command}...`;
   }
 
-  // ✅ Cấp quyền admin
+  // Cấp quyền admin
   if (command === "user" && parts.length >= 4 && parts[3] === "admin") {
     const targetUserId = parts[2];
 
@@ -415,19 +415,19 @@ async function handleCommand(input) {
         updateLocalSessionForRoleChange({ isAdmin: true });
       }
 
-      return `✅ Đã cấp quyền admin cho user ${targetUserId}`;
+      return `Đã cấp quyền admin cho user ${targetUserId}`;
     } catch (error) {
-      console.error("❌ Lỗi khi cấp quyền admin:", error);
-      return "❌ Lỗi khi cấp quyền admin.";
+      console.error("Lỗi khi cấp quyền admin:", error);
+      return "Lỗi khi cấp quyền admin.";
     }
   }
 
-  // 🔒 Gỡ quyền admin
+  // Gỡ quyền admin
   if (command === "remove" && parts.length >= 4 && parts[3] === "admin") {
     const targetUserId = parts[2];
 
     if (targetUserId === SUPER_ADMIN_UID) {
-      return "❗ Không thể gỡ quyền ADMIN GỐC.";
+      return "Không thể gỡ quyền ADMIN GỐC.";
     }
 
     try {
@@ -440,29 +440,29 @@ async function handleCommand(input) {
         updateLocalSessionForRoleChange({ isAdmin: false });
       }
 
-      return `✅ Đã gỡ quyền admin khỏi user ${targetUserId}`;
+      return `Đã gỡ quyền admin khỏi user ${targetUserId}`;
     } catch (error) {
-      console.error("❌ Lỗi khi gỡ quyền admin:", error);
-      return "❌ Lỗi khi gỡ quyền admin.";
+      console.error(" Lỗi khi gỡ quyền admin:", error);
+      return "Lỗi khi gỡ quyền admin.";
     }
   }
 
-  // 🚫 Ban (xoá) người dùng
+  // Ban (xoá) người dùng
   if (command === "user" && parts.length >= 4 && parts[3] === "ban") {
     console.log("Lệnh ban được kích hoạt");
 
     const targetUserId = parts[2];
 
     if (!currentUserUid) {
-      return "❗ Không xác định được UID người dùng hiện tại.";
+      return "Không xác định được UID người dùng hiện tại.";
     }
 
     if (currentUserUid !== SUPER_ADMIN_UID) {
-      return "❌ Bạn không có quyền dùng lệnh này.";
+      return "Bạn không có quyền dùng lệnh này.";
     }
 
     if (targetUserId === SUPER_ADMIN_UID) {
-      return "❌ Không thể xoá người dùng đặc biệt này.";
+      return "Không thể xoá người dùng đặc biệt này.";
     }
 
     try {
@@ -478,13 +478,13 @@ async function handleCommand(input) {
       const data = await response.json();
 
       if (!response.ok) {
-        return "❌ " + (data.error || "Lỗi không xác định.");
+        return " X " + (data.error || "Lỗi không xác định.");
       }
 
-      return data.message || "✅ Đã xoá người dùng.";
+      return data.message || "Đã xoá người dùng.";
     } catch (error) {
       console.error(error);
-      return "❌ Lỗi không xác định khi gọi API.";
+      return "Lỗi không xác định khi gọi API.";
     }
   }
 
@@ -584,11 +584,7 @@ async function getWitResponse(input) {
         notifyCannedReply("Chatbot đã trả lời", reply);
         return reply;
       }
-      case 'ask_features': {
-        const reply = 'Tôi có chức năng trò chuyện, giải đáp các thắc mắc của bạn về sản phẩm và dịch vụ bên chúng tôi';
-        notifyCannedReply("Chatbot đã trả lời", reply);
-        return reply;
-      }
+      
       case 'thank': {
         const reply = 'Cảm ơn bạn vì đã tin tưởng dịch vụ bên mình';
         notifyCannedReply("Chatbot đã trả lời", reply);
@@ -596,6 +592,21 @@ async function getWitResponse(input) {
       }
       case 'goodbye': {
         const reply = 'Cảm ơn bạn, hẹn gặp lại!';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'ask_features': {
+        const reply = 'Tôi có chức năng trò chuyện, giải đáp các thắc mắc của bạn về sản phẩm và dịch vụ bên chúng tôi';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'store_info': {
+        const reply = 'Cửa hàng của chúng tôi hiện tại có 1 chi nhánh nằm ở 99, Đường Này, Quận Đó, Thành phố Hồ Chí Minh';
+        notifyCannedReply("Chatbot đã trả lời", reply);
+        return reply;
+      }
+      case 'working_time': {
+        const reply = 'Giờ làm việc của của hàng chúng tôi là từ 8:00 sáng đến 10:00 tối, từ thứ Hai đến thứ Sáu hàng tuần.';
         notifyCannedReply("Chatbot đã trả lời", reply);
         return reply;
       }
@@ -652,7 +663,7 @@ async function sendMessage() {
 
   setTimeout(async () => {
     try {
-      const response = await processInput(text); // 👉 xử lý command hoặc gọi Wit.ai
+      const response = await processInput(text); // xử lý command hoặc gọi Wit.ai
       addMessage('Chatbot', response, 'left');
 
       if (typeof chatbotBox !== 'undefined' && chatbotBox.style.display === 'none') {

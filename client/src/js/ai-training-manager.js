@@ -1,4 +1,4 @@
-// ✅ ai-manager.js
+// ai-manager.js
 
 import { showToast } from "./toast.js";
 
@@ -7,10 +7,8 @@ const API_BASE_URL = "https://bookstore-bsjx.onrender.com";
 let allProducts = [];
 let currentProduct = null;
 
-// ===============================
-// ✅ Load toàn bộ products.json
-// ===============================
 
+// Load toàn bộ products.json
 document.addEventListener("DOMContentLoaded", () => {
 
     loadProductsJson();
@@ -37,9 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ===============================
-// ✅ Load dữ liệu
-// ===============================
+// Load dữ liệu
 
 async function loadProductsJson() {
 
@@ -70,7 +66,7 @@ async function loadProductsJson() {
 
 
 // ===============================
-// ✅ Render bảng
+// Render bảng
 // ===============================
 
 function renderProducts(data) {
@@ -135,9 +131,7 @@ Xóa
 }
 
 
-// ===============================
-// ✅ Rút gọn summary
-// ===============================
+// Rút gọn summary
 
 function shortSummary(text) {
 
@@ -151,9 +145,7 @@ function shortSummary(text) {
 }
 
 
-// ===============================
-// ✅ Search
-// ===============================
+// Search
 
 function searchProducts(e) {
 
@@ -198,9 +190,7 @@ ${product.summary || ""}
 }
 
 
-// ===============================
-// ✅ Xem chi tiết
-// ===============================
+// Xem chi tiết
 
 window.viewProduct =
     async function (id) {
@@ -254,7 +244,7 @@ window.viewProduct =
             console.error(error);
 
             showToast(
-                "❌ Không lấy được dữ liệu",
+                "Không lấy được dữ liệu",
                 "error"
             );
 
@@ -263,9 +253,7 @@ window.viewProduct =
     };
 
 
-// ===============================
-// ✅ Copy JSON
-// ===============================
+// Copy JSON
 
 document
     .getElementById("copy-json-btn")
@@ -285,16 +273,14 @@ document
         );
 
         showToast(
-            "✅ Đã copy JSON",
+            "Đã copy JSON",
             "success"
         );
 
     });
 
 
-// ===============================
-// ✅ Xóa khỏi AI
-// ===============================
+// Xóa khỏi AI
 
 window.deleteProductFromAI =
     async function (id) {
@@ -327,7 +313,7 @@ window.deleteProductFromAI =
             }
 
             showToast(
-                "✅ Đã xóa khỏi AI",
+                "Đã xóa khỏi AI",
                 "success"
             );
 
@@ -342,7 +328,7 @@ window.deleteProductFromAI =
             console.error(error);
 
             showToast(
-                "❌ Không thể xóa",
+                "Không thể xóa",
                 "error"
             );
 

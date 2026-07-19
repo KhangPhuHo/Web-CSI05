@@ -225,8 +225,14 @@ Tính năng thông báo sẽ giúp người dùng nhận thông báo khi:
 * Trang thông tin khi cập nhật thêm bài báo
 * Trang đơn đã đặt khi hệ thống cập nhật trạng thái đơn hàng
 
+16. THÔNG TIN LIÊN HỆ
+Quý khách có thể liên hệ của hàng thông qua các hình thức như sau:
 
-16. HỖ TRỢ KHÁCH HÀNG
+* Số điện thoại: 0909999999
+* Email: bookstore@example.com
+* Các nền tảng mạng xã hội như: Facebook, Instagram, X
+
+17. HỖ TRỢ KHÁCH HÀNG
 
 Nếu gặp bất kỳ vấn đề nào trong quá trình:
 

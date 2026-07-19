@@ -21,7 +21,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// ================== PHAN 1: OFFLINE 404 CACHE ==================
+// PHAN 1: OFFLINE 404 CACHE
 
 const CACHE_NAME = "offline-cache-v2";
 // Doi duong dan nay thanh file offline that su cua ban (vd: /404.html)
@@ -59,7 +59,7 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-// ================== PHAN 2: FIREBASE PUSH NOTIFICATION ==================
+// PHAN 2: FIREBASE PUSH NOTIFICATION
 
 // Xu ly khi nhan push luc trinh duyet/tab dang DONG hoac chay ngam
 messaging.onBackgroundMessage((payload) => {

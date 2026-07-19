@@ -96,9 +96,7 @@ def ensure_bot_ready():
         )
 
 
-# ------------------------------------------------------------------
 # POST /ask - hoi dap bang TEXT
-# ------------------------------------------------------------------
 
 class HistoryTurn(BaseModel):
     role: str      # "user" hoac "assistant"
@@ -162,11 +160,8 @@ async def recommend_from_image(image: UploadFile = File(...)):
     return result
 
 
-# ------------------------------------------------------------------
 # GET /health - kiem tra server con song, KHONG yeu cau API key
 # (dung de "danh thuc" server tren Render truoc khi goi that, giong wake_up_render())
-# ------------------------------------------------------------------
-
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     # Luon tra ve NGAY LAP TUC, khong phu thuoc bot_ready - dung de Render
