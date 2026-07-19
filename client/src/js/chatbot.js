@@ -599,21 +599,12 @@ async function getWitResponse(input) {
         notifyCannedReply("Chatbot đã trả lời", reply);
         return reply;
       }
-      case 'ask_product':
-      case 'products_by_category':
-      case 'get_price_of_product':
-      case 'check_stock':
-      case 'compare_price':
-      case 'top_rated_products':
-      case "product_detail":
-      case 'buy_product':
+      default:
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
         // (nhanh nay DA co thong bao roi - server-side, qua notifyUser()
         // trong ragController.js, khong can them gi o day)
-        return await askRagChatbot(input);
-      default:
-        // Intent khong ro / Wit.ai chua nhan dien duoc -> van thu hoi RAG chatbot,
+        // Hoặc vì Intent khong ro / Wit.ai chua nhan dien duoc -> van thu hoi RAG chatbot,
         // vi rat co the day la cau hoi ve sach ma Wit.ai chua duoc train du
         return await askRagChatbot(input);
     }
