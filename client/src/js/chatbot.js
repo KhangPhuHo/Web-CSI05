@@ -600,16 +600,6 @@ async function getWitResponse(input) {
         notifyCannedReply("Chatbot đã trả lời", reply);
         return reply;
       }
-      case 'store_info': {
-        const reply = 'Cửa hàng của chúng tôi hiện tại có 1 chi nhánh nằm ở 99, Đường Này, Quận Đó, Thành phố Hồ Chí Minh';
-        notifyCannedReply("Chatbot đã trả lời", reply);
-        return reply;
-      }
-      case 'working_time': {
-        const reply = 'Giờ làm việc của của hàng chúng tôi là từ 8:00 sáng đến 10:00 tối, từ thứ Hai đến thứ Sáu hàng tuần.';
-        notifyCannedReply("Chatbot đã trả lời", reply);
-        return reply;
-      }
       default:
         // Cau hoi ve san pham cu the (gia, ton kho, the loai, goi y sach...)
         // -> day sang RAG chatbot (Gemini) de tra loi dua tren du lieu that
